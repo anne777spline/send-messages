@@ -20,7 +20,7 @@ export default function Home() {
   const [selectedBuilding, setSelectedBuilding] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [template, setTemplate] = useState<string>(
-    "Good day {owner_name}, I hope you're doing well. Reaching out regarding your property in {building_name} (Unit {unit_number})."
+    "Good day {owner_name}, I hope you're doing well. Reaching out from Six Tenet regarding your property in {building_name} (Unit {unit_number})."
   );
   const [results, setResults] = useState<any[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -182,7 +182,7 @@ export default function Home() {
           <div>
             <h1 className="text-2xl md:text-3xl font-semibold text-white flex items-center gap-3">
               <Building2 className="w-8 h-8 text-blue-500 flex-shrink-0" />
-              <span>Broker Landlord Messenger</span>
+              <span>Six Tenet Campaign Dispatcher</span>
             </h1>
             <p className="text-[#999999] text-sm md:text-base mt-1">
               Instant contact search, filtering by building, and an automated system for sending WhatsApp campaigns.

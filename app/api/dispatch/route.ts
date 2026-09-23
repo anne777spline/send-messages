@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const { building, phoneSearch, template, selectedIds } = body;
 
     const webhookUrl =
-      process.env.N8N_WEBHOOK_URL || 'https://n8n.kostiv-mea.com/webhook-test/landlord-campaign';
+      process.env.N8N_WEBHOOK_URL || 'https://n8n.kostiv-mea.com/webhook/sixtenet-campaign';
 
     let query = supabase
       .from('properties')
