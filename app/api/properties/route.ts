@@ -93,9 +93,21 @@ export async function GET(request: Request) {
       query = query.or(conditions.join(','));
     }
 
-    const { data, error } = await query.limit(500);
-    if (error) throw error;
-    return NextResponse.json({ success: true, count: data?.length || 0, data: data || [] });
+    const MAX_RESULTS = 2500;
+    const allData: any[] = [];
+    let page = 0;
+    const pageSize = 1000;
+
+    while (allData.length < MAX_RESULTS) {
+      const { data, error } = await query.range(page * pageSize, (page + 1) * pageSize - 1);
+      if (error) throw error;
+      if (!data || data.length === 0) break;
+      allData.push(...data);
+      if (data.length < pageSize) break;
+      page++;
+    }
+
+    return NextResponse.json({ success: true, count: allData.length, data: allData });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

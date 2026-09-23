@@ -29,13 +29,23 @@ export async function POST(request: Request) {
       }
     }
 
-    const { data, error } = await query.limit(2000);
-    if (error) throw error;
-    if (!data || data.length === 0) {
+    const allContacts: any[] = [];
+    let p = 0;
+    const pSize = 1000;
+    while (allContacts.length < 2500) {
+      const { data, error } = await query.range(p * pSize, (p + 1) * pSize - 1);
+      if (error) throw error;
+      if (!data || data.length === 0) break;
+      allContacts.push(...data);
+      if (data.length < pSize) break;
+      p++;
+    }
+
+    if (allContacts.length === 0) {
       return NextResponse.json({ success: false, error: 'No contacts selected or found.' }, { status: 404 });
     }
 
-    const leads = data.map((row: any) => {
+    const leads = allContacts.map((row: any) => {
       let message = template || "Good day, I hope you're doing well.";
       message = message
         .replace(/{owner_name}/gi, row.owner_name || '')
