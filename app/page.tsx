@@ -186,7 +186,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Top Header */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-[#2b2b2b] pb-6 gap-4">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-semibold text-white flex items-center gap-3">
               <Building2 className="w-8 h-8 text-blue-500 flex-shrink-0" />
@@ -293,7 +293,6 @@ export default function Home() {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-[#cccccc] flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
-                    <Search className="w-4 h-4 text-blue-400" />
                     Search by Keyword
                   </span>
                   {searchTerm && (
@@ -309,22 +308,18 @@ export default function Home() {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search by building (e.g. Luma, Binghatti), phone, name..."
+                    placeholder="Search by building (e.g. Binghatti), owner, phone, name..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#666666] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
-                <p className="text-xs text-[#777777]">
-                  Search by building name, owner name, phone number, or unit.
-                </p>
               </div>
 
               {/* Exact Building Select Dropdown */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-[#cccccc] flex items-center gap-1.5">
-                    <Building2 className="w-4 h-4 text-blue-400" />
                     Filter by Building
                   </label>
                   <div className="flex items-center gap-2">
@@ -364,7 +359,7 @@ export default function Home() {
                 className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-50 text-white font-medium py-3 px-5 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-sm"
               >
                 {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                <span>{loading ? 'Searching Database...' : 'Search / Apply Filter'}</span>
+                <span>{loading ? 'Searching Database...' : 'Search Properties'}</span>
               </button>
             </form>
 
@@ -408,7 +403,7 @@ export default function Home() {
                 {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 <span>
                   {sending
-                    ? 'Dispatching via n8n...'
+                    ? 'Dispatching Campaign...'
                     : `Send WhatsApp Campaign (${selectedIds.size.toLocaleString()} selected)`}
                 </span>
               </button>
