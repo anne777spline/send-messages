@@ -8,13 +8,16 @@ import {
   Database,
   RefreshCw,
   CheckCircle,
+  Smartphone,
   Upload,
   FileText,
   X,
   Copy,
   Check,
   Filter,
-  AlertCircle
+  AlertCircle,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 
 export default function Home() {
@@ -25,6 +28,7 @@ export default function Home() {
     "Good day {owner_name}, I hope you're doing well. Reaching out regarding your property in {building_name} (Unit {unit_number})."
   );
   const [results, setResults] = useState<any[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState<boolean>(false);
   const [buildingsLoading, setBuildingsLoading] = useState<boolean>(false);
   const [sending, setSending] = useState<boolean>(false);
@@ -67,13 +71,18 @@ export default function Home() {
       const res = await fetch(`/api/properties?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
-        setResults(data.data || []);
+        const rows = data.data || [];
+        setResults(rows);
+        // By default, select all retrieved rows
+        setSelectedIds(new Set(rows.map((r: any) => r.id)));
       } else {
         setResults([]);
+        setSelectedIds(new Set());
       }
     } catch (err) {
       console.error('Error executing search:', err);
       setResults([]);
+      setSelectedIds(new Set());
     } finally {
       setLoading(false);
     }
@@ -83,8 +92,31 @@ export default function Home() {
     setSelectedBuilding('');
     setSearchTerm('');
     setResults([]);
+    setSelectedIds(new Set());
     setHasSearched(false);
     setDispatchResult(null);
+  };
+
+  // Toggle single row selection
+  const toggleSelectRow = (id: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  // Toggle select all
+  const toggleSelectAll = () => {
+    if (selectedIds.size === results.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(results.map(r => r.id)));
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,7 +145,7 @@ export default function Home() {
   };
 
   const handleDispatch = async () => {
-    if (results.length === 0) return;
+    if (selectedIds.size === 0) return;
     setSending(true);
     setDispatchResult(null);
     try {
@@ -123,7 +155,8 @@ export default function Home() {
         body: JSON.stringify({
           building: selectedBuilding,
           phoneSearch: searchTerm,
-          template
+          template,
+          selectedIds: Array.from(selectedIds)
         })
       });
       const data = await res.json();
@@ -145,6 +178,9 @@ export default function Home() {
     setTimeout(() => setCopiedPhone(null), 2000);
   };
 
+  const isAllSelected = results.length > 0 && selectedIds.size === results.length;
+  const isPartiallySelected = selectedIds.size > 0 && selectedIds.size < results.length;
+
   return (
     <main className="min-h-screen bg-[#181818] text-[#e1e1e1] p-4 md:p-8 font-sans text-base">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -157,7 +193,7 @@ export default function Home() {
               <span>Broker Landlord Messenger</span>
             </h1>
             <p className="text-[#999999] text-sm md:text-base mt-1">
-              Instant contact search, filtering by building, and an automated system for sending WhatsApp campaigns.
+              Instant contact lookup (&quot;Which Property?&quot;), building filtering, and automated WhatsApp campaign dispatcher.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -212,10 +248,11 @@ export default function Home() {
 
               {importResult && (
                 <div
-                  className={`p-3 rounded-lg text-sm flex items-start gap-2.5 ${importResult.success
-                    ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
-                    : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
-                    }`}
+                  className={`p-3 rounded-lg text-sm flex items-start gap-2.5 ${
+                    importResult.success
+                      ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
+                      : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
+                  }`}
                 >
                   {importResult.success ? (
                     <>
@@ -286,7 +323,7 @@ export default function Home() {
                   />
                 </div>
                 <p className="text-xs text-[#777777]">
-                  Search by building name, owner name, phone number, or unit.
+                  Flexible search (contains). Matches building name, landlord name, phone, or unit.
                 </p>
               </div>
 
@@ -313,7 +350,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Dropdown with all 1,675 buildings */}
                 <select
                   value={selectedBuilding}
                   onChange={e => setSelectedBuilding(e.target.value)}
@@ -373,23 +409,24 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleDispatch}
-                disabled={sending || results.length === 0}
+                disabled={sending || selectedIds.size === 0}
                 className="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-40 disabled:hover:bg-emerald-600 text-white font-medium py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-sm"
               >
                 {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 <span>
                   {sending
                     ? 'Dispatching via n8n...'
-                    : `Send WhatsApp Campaign (${results.length.toLocaleString()} leads)`}
+                    : `Send WhatsApp Campaign (${selectedIds.size.toLocaleString()} selected)`}
                 </span>
               </button>
 
               {dispatchResult && (
                 <div
-                  className={`p-3.5 rounded-lg text-xs ${dispatchResult.success
-                    ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
-                    : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
-                    }`}
+                  className={`p-3.5 rounded-lg text-xs ${
+                    dispatchResult.success
+                      ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
+                      : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
+                  }`}
                 >
                   {dispatchResult.success ? (
                     <div className="space-y-1">
@@ -407,31 +444,40 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Column: Results & Instant Preview */}
+          {/* Right Column: Results & Checkbox Table */}
           <div className="lg:col-span-2 bg-[#222222] border border-[#333333] rounded-xl p-5 flex flex-col min-h-[600px] space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#2d2d2d] pb-4 gap-2">
-              <div>
+              <div className="flex items-center gap-3">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                   <span>Search Results</span>
                   <span className="text-xs bg-[#2b2b2b] text-blue-400 px-2.5 py-0.5 rounded-full font-mono">
                     {results.length.toLocaleString()} found
                   </span>
                 </h2>
-                {selectedBuilding && (
-                  <p className="text-xs text-[#888888] mt-1">
-                    Filtered by building: <strong className="text-[#cccccc]">{selectedBuilding}</strong>
-                  </p>
+                {results.length > 0 && (
+                  <span className="text-xs bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 px-2 py-0.5 rounded font-mono">
+                    {selectedIds.size} of {results.length} selected
+                  </span>
                 )}
               </div>
 
               {results.length > 0 && (
-                <button
-                  type="button"
-                  onClick={handleClearFilters}
-                  className="text-xs text-[#888888] hover:text-white transition"
-                >
-                  Clear results
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={toggleSelectAll}
+                    className="text-xs bg-[#2d2d2d] hover:bg-[#383838] border border-[#444444] px-2.5 py-1 rounded text-[#cccccc] hover:text-white transition"
+                  >
+                    {isAllSelected ? 'Deselect All' : 'Select All'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleClearFilters}
+                    className="text-xs text-[#888888] hover:text-white transition ml-2"
+                  >
+                    Clear results
+                  </button>
+                </div>
               )}
             </div>
 
@@ -447,7 +493,7 @@ export default function Home() {
                   {hasSearched ? 'No records match your search criteria.' : 'Search by keyword (e.g. Luma, Binghatti, phone) or select a building.'}
                 </p>
                 <p className="text-xs text-[#666666] max-w-sm text-center">
-                  Tip: You can search by entering building names, landlord names, full or partial phone numbers.
+                  Tip: You can use the checkboxes to pick exactly who receives the message before sending.
                 </p>
               </div>
             ) : (
@@ -455,6 +501,17 @@ export default function Home() {
                 <table className="w-full text-left border-collapse text-sm">
                   <thead className="sticky top-0 bg-[#1a1a1a] text-[#aaaaaa] border-b border-[#2d2d2d] z-10 shadow-sm">
                     <tr>
+                      <th className="py-3 px-3 w-10 text-center">
+                        <input
+                          type="checkbox"
+                          checked={isAllSelected}
+                          ref={input => {
+                            if (input) input.indeterminate = isPartiallySelected;
+                          }}
+                          onChange={toggleSelectAll}
+                          className="w-4 h-4 rounded border-[#444444] bg-[#222222] text-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                        />
+                      </th>
                       <th className="py-3 px-4 font-medium">Landlord Name</th>
                       <th className="py-3 px-4 font-medium">Phone Number</th>
                       <th className="py-3 px-4 font-medium">Building</th>
@@ -465,6 +522,7 @@ export default function Home() {
                   </thead>
                   <tbody className="divide-y divide-[#2a2a2a] bg-[#1f1f1f]">
                     {results.map((row: any) => {
+                      const isSelected = selectedIds.has(row.id);
                       const msg = template
                         .replace(/{owner_name}/gi, row.owner_name || '')
                         .replace(/{building_name}/gi, row.building_name || '')
@@ -474,7 +532,21 @@ export default function Home() {
                         .trim();
 
                       return (
-                        <tr key={row.id} className="hover:bg-[#282828] transition group">
+                        <tr
+                          key={row.id}
+                          onClick={() => toggleSelectRow(row.id)}
+                          className={`transition cursor-pointer group ${
+                            isSelected ? 'bg-[#1e293b]/50 hover:bg-[#1e293b]/70' : 'hover:bg-[#282828]'
+                          }`}
+                        >
+                          <td className="py-3 px-3 text-center" onClick={e => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleSelectRow(row.id)}
+                              className="w-4 h-4 rounded border-[#444444] bg-[#222222] text-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                            />
+                          </td>
                           <td className="py-3 px-4 font-medium text-white whitespace-nowrap">
                             {row.owner_name || <span className="text-[#666666] italic">Unknown</span>}
                           </td>
@@ -483,7 +555,10 @@ export default function Home() {
                               <span>{row.phone}</span>
                               <button
                                 type="button"
-                                onClick={() => copyToClipboard(row.phone)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyToClipboard(row.phone);
+                                }}
                                 title="Copy phone number"
                                 className="opacity-0 group-hover:opacity-100 text-[#888888] hover:text-white transition p-1"
                               >
