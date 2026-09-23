@@ -6,10 +6,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { building, phoneSearch, template, selectedIds } = body;
 
-    const webhookUrl = process.env.N8N_WEBHOOK_URL;
-    if (!webhookUrl) {
-      return NextResponse.json({ success: false, error: 'N8N_WEBHOOK_URL not configured.' }, { status: 500 });
-    }
+    const webhookUrl =
+      process.env.N8N_WEBHOOK_URL || 'https://n8n.kostiv-mea.com/webhook-test/landlord-campaign';
 
     let query = supabase
       .from('properties')
