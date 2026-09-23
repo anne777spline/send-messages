@@ -193,14 +193,8 @@ export default function Home() {
               <span>Broker Landlord Messenger</span>
             </h1>
             <p className="text-[#999999] text-sm md:text-base mt-1">
-              Instant contact lookup (&quot;Which Property?&quot;), building filtering, and automated WhatsApp campaign dispatcher.
+              Instant contact search, filtering by building, and an automated system for sending WhatsApp campaigns.
             </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="bg-[#222222] border border-[#333333] px-4 py-2 rounded-lg text-sm flex items-center gap-2.5">
-              <Database className="w-4 h-4 text-emerald-400" />
-              <span className="text-[#cccccc]">Supabase: <strong className="text-white">Connected</strong></span>
-            </div>
           </div>
         </header>
 
@@ -248,11 +242,10 @@ export default function Home() {
 
               {importResult && (
                 <div
-                  className={`p-3 rounded-lg text-sm flex items-start gap-2.5 ${
-                    importResult.success
-                      ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
-                      : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
-                  }`}
+                  className={`p-3 rounded-lg text-sm flex items-start gap-2.5 ${importResult.success
+                    ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
+                    : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
+                    }`}
                 >
                   {importResult.success ? (
                     <>
@@ -301,7 +294,7 @@ export default function Home() {
                 <label className="text-sm font-medium text-[#cccccc] flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
                     <Search className="w-4 h-4 text-blue-400" />
-                    Keyword Search (Contains)
+                    Search by Keyword
                   </span>
                   {searchTerm && (
                     <button
@@ -323,7 +316,7 @@ export default function Home() {
                   />
                 </div>
                 <p className="text-xs text-[#777777]">
-                  Flexible search (contains). Matches building name, landlord name, phone, or unit.
+                  Search by building name, owner name, phone number, or unit.
                 </p>
               </div>
 
@@ -332,7 +325,7 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-[#cccccc] flex items-center gap-1.5">
                     <Building2 className="w-4 h-4 text-blue-400" />
-                    Filter by Building Dropdown
+                    Filter by Building
                   </label>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-[#888888]">
@@ -422,11 +415,10 @@ export default function Home() {
 
               {dispatchResult && (
                 <div
-                  className={`p-3.5 rounded-lg text-xs ${
-                    dispatchResult.success
-                      ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
-                      : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
-                  }`}
+                  className={`p-3.5 rounded-lg text-xs ${dispatchResult.success
+                    ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
+                    : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
+                    }`}
                 >
                   {dispatchResult.success ? (
                     <div className="space-y-1">
@@ -535,9 +527,8 @@ export default function Home() {
                         <tr
                           key={row.id}
                           onClick={() => toggleSelectRow(row.id)}
-                          className={`transition cursor-pointer group ${
-                            isSelected ? 'bg-[#1e293b]/50 hover:bg-[#1e293b]/70' : 'hover:bg-[#282828]'
-                          }`}
+                          className={`transition cursor-pointer group ${isSelected ? 'bg-[#1e293b]/50 hover:bg-[#1e293b]/70' : 'hover:bg-[#282828]'
+                            }`}
                         >
                           <td className="py-3 px-3 text-center" onClick={e => e.stopPropagation()}>
                             <input
