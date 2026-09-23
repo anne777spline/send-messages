@@ -181,7 +181,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Top Header */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 gap-4 border-b border-[#2b2b2b]">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-semibold text-white flex items-center gap-3">
               <Building2 className="w-8 h-8 text-blue-500 flex-shrink-0" />
@@ -190,12 +190,6 @@ export default function Home() {
             <p className="text-[#999999] text-sm md:text-base mt-1">
               Instant contact search, filtering by building, and an automated system for sending WhatsApp campaigns.
             </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="bg-[#222222] border border-[#333333] px-4 py-2 rounded-lg text-sm flex items-center gap-2.5">
-              <Database className="w-4 h-4 text-emerald-400" />
-              <span className="text-[#cccccc]">Supabase: <strong className="text-white">Connected</strong></span>
-            </div>
           </div>
         </header>
 
@@ -243,11 +237,10 @@ export default function Home() {
 
               {importResult && (
                 <div
-                  className={`p-3 rounded-lg text-sm flex items-start gap-2.5 ${
-                    importResult.success
-                      ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
-                      : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
-                  }`}
+                  className={`p-3 rounded-lg text-sm flex items-start gap-2.5 ${importResult.success
+                    ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
+                    : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
+                    }`}
                 >
                   {importResult.success ? (
                     <>
@@ -319,11 +312,10 @@ export default function Home() {
 
               {dispatchResult && (
                 <div
-                  className={`p-3.5 rounded-lg text-xs ${
-                    dispatchResult.success
-                      ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
-                      : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
-                  }`}
+                  className={`p-3.5 rounded-lg text-xs ${dispatchResult.success
+                    ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
+                    : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
+                    }`}
                 >
                   {dispatchResult.success ? (
                     <div className="space-y-1">
@@ -499,9 +491,8 @@ export default function Home() {
                           <tr
                             key={row.id}
                             onClick={() => toggleSelectRow(row.id)}
-                            className={`transition cursor-pointer group ${
-                              isSelected ? 'bg-[#1e293b]/50 hover:bg-[#1e293b]/70' : 'hover:bg-[#282828]'
-                            }`}
+                            className={`transition cursor-pointer group ${isSelected ? 'bg-[#1e293b]/50 hover:bg-[#1e293b]/70' : 'hover:bg-[#282828]'
+                              }`}
                           >
                             <td className="py-3 px-3 text-center" onClick={e => e.stopPropagation()}>
                               <input
