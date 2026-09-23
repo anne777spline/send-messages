@@ -5,16 +5,13 @@ import {
   Search,
   Building2,
   Send,
-  Database,
   RefreshCw,
   CheckCircle,
-  Smartphone,
   Upload,
   FileText,
   X,
   Copy,
   Check,
-  Filter,
   AlertCircle
 } from 'lucide-react';
 
