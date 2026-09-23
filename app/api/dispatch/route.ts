@@ -42,7 +42,7 @@ export async function POST(request: Request) {
         .replace(/{building_name}/gi, row.building_name || '')
         .replace(/{unit_number}/gi, row.unit_number || '')
         .replace(/{rooms}/gi, row.rooms || '')
-        .replace(/\s+/g, ' ').trim();
+        .replace(/[ \t]+/g, ' ').trim();
       return {
         id: row.id,
         phone: row.phone,
