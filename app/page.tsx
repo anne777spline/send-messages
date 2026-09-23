@@ -345,101 +345,65 @@ export default function Home() {
           {/* Right Column: Filters & Lookup on top of Search Results Table */}
           <div className="lg:col-span-2 space-y-6">
 
-            {/* Filters & Lookup Card (Moved to the data column) */}
-            <form onSubmit={handleSearch} className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-[#2d2d2d] pb-3">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Filter className="w-5 h-5 text-blue-400" />
-                  Filters & Lookup
-                </h2>
-                {(searchTerm || selectedBuilding) && (
+            {/* Minimalist Inline Search Bar */}
+            <form onSubmit={handleSearch} className="bg-[#222222] border border-[#333333] rounded-xl p-3 flex flex-col sm:flex-row items-center gap-3">
+              {/* Keyword Search Input */}
+              <div className="relative flex-1 w-full">
+                <input
+                  type="text"
+                  placeholder="Search by building, owner, phone, unit..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-4 py-2.5 text-sm text-white placeholder-[#666666] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+                {searchTerm && (
                   <button
                     type="button"
-                    onClick={handleClearFilters}
-                    className="text-xs text-[#888888] hover:text-white flex items-center gap-1 transition"
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#888888] hover:text-white"
                   >
-                    <X className="w-3.5 h-3.5" />
-                    Clear all filters
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Flexible Written Search Input */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#cccccc] flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <Search className="w-4 h-4 text-blue-400" />
-                      Search by Keyword
-                    </span>
-                    {searchTerm && (
-                      <button
-                        type="button"
-                        onClick={() => setSearchTerm('')}
-                        className="text-xs text-[#888888] hover:text-white"
-                      >
-                        Clear
-                      </button>
-                    )}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search by building (e.g. Binghatti), owner, phone, name..."
-                      value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
-                      className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#666666] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Exact Building Select Dropdown */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-[#cccccc] flex items-center gap-1.5">
-                      <Building2 className="w-4 h-4 text-blue-400" />
-                      Filter by Building
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#888888]">
-                        {buildingsLoading ? 'Loading...' : `${buildings.length.toLocaleString()} buildings`}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={loadBuildings}
-                        disabled={buildingsLoading}
-                        title="Reload buildings list"
-                        className="text-[#777777] hover:text-white transition disabled:opacity-40"
-                      >
-                        <RefreshCw className={`w-3.5 h-3.5 ${buildingsLoading ? 'animate-spin' : ''}`} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <select
-                    value={selectedBuilding}
-                    onChange={e => setSelectedBuilding(e.target.value)}
-                    className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 text-ellipsis"
-                  >
-                    <option value="">-- All Buildings ({buildings.length.toLocaleString()}) --</option>
-                    {buildings.map(b => (
-                      <option key={b} value={b}>
-                        {b}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* Exact Building Select Dropdown */}
+              <div className="w-full sm:w-64 flex-shrink-0">
+                <select
+                  value={selectedBuilding}
+                  onChange={e => setSelectedBuilding(e.target.value)}
+                  className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 text-ellipsis"
+                >
+                  <option value="">All Buildings ({buildings.length.toLocaleString()})</option>
+                  {buildings.map(b => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Action Button */}
+              {/* Search Button (Icon only) */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-50 text-white font-medium py-2.5 px-5 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-sm"
+                title="Search Properties"
+                className="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-50 text-white p-2.5 rounded-lg flex items-center justify-center transition shadow-sm flex-shrink-0 w-full sm:w-11 h-10"
               >
-                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                <span>{loading ? 'Searching Database...' : 'Search Properties'}</span>
+                {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
               </button>
+
+              {/* Clear button if search is active */}
+              {(searchTerm || selectedBuilding) && (
+                <button
+                  type="button"
+                  onClick={handleClearFilters}
+                  title="Clear all filters"
+                  className="text-[#888888] hover:text-white hover:bg-[#2d2d2d] p-2.5 rounded-lg transition flex items-center justify-center flex-shrink-0 w-full sm:w-10 h-10"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
             </form>
 
             {/* Results & Checkbox Table Card */}
