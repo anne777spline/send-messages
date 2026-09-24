@@ -1,7 +1,19 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { getAuthenticatedTenant, isAuthError } from '@/lib/auth';
+import { createServerSupabase } from '@/lib/supabaseServer';
 
 export async function GET(request: Request) {
+  let tenant;
+  try {
+    tenant = await getAuthenticatedTenant();
+  } catch (e) {
+    if (isAuthError(e)) {
+      return NextResponse.json({ success: false, error: e.message }, { status: e.status });
+    }
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const supabase = createServerSupabase();
   const { searchParams } = new URL(request.url);
   const building = searchParams.get('building');
   const search = searchParams.get('search') || searchParams.get('phone') || searchParams.get('q');
@@ -9,71 +21,35 @@ export async function GET(request: Request) {
 
   try {
     if (action === 'buildings') {
-      // 1. Fetch ALL pages using the RPC function get_distinct_buildings
-      let allBuildings: string[] = [];
-      let page = 0;
-      const pageSize = 1000;
-      let usedRpc = false;
-
-      while (true) {
+      const set = new Set<string>();
+      for (let p = 0; p < 65; p++) {
         const { data, error } = await supabase
-          .rpc('get_distinct_buildings')
-          .range(page * pageSize, (page + 1) * pageSize - 1);
-
-        if (error) {
-          console.error('RPC pagination error:', error.message);
-          break;
-        }
-
-        if (!data || data.length === 0) {
-          usedRpc = true;
-          break;
-        }
-
-        usedRpc = true;
+          .from('properties')
+          .select('building_name')
+          .eq('tenant_id', tenant.tenantId)
+          .not('building_name', 'is', null)
+          .range(p * 1000, (p + 1) * 1000 - 1);
+        if (error || !data || data.length === 0) break;
         data.forEach((r: any) => {
-          const name = typeof r === 'string' ? r : r.building_name;
-          if (name && name.trim()) allBuildings.push(name.trim());
+          if (r.building_name && r.building_name.trim()) {
+            set.add(r.building_name.trim());
+          }
         });
-
-        if (data.length < pageSize) break;
-        page++;
       }
-
-      // 2. Fallback if RPC is not available
-      if (!usedRpc || allBuildings.length === 0) {
-        const set = new Set<string>();
-        for (let p = 0; p < 65; p++) {
-          const { data, error } = await supabase
-            .from('properties')
-            .select('building_name')
-            .not('building_name', 'is', null)
-            .range(p * 1000, (p + 1) * 1000 - 1);
-          if (error || !data || data.length === 0) break;
-          data.forEach((r: any) => {
-            if (r.building_name && r.building_name.trim()) {
-              set.add(r.building_name.trim());
-            }
-          });
-        }
-        allBuildings = Array.from(set);
-      }
-
-      const uniqueSorted = Array.from(new Set(allBuildings)).sort((a, b) => a.localeCompare(b));
+      const uniqueSorted = Array.from(set).sort((a, b) => a.localeCompare(b));
       return NextResponse.json({ success: true, count: uniqueSorted.length, buildings: uniqueSorted });
     }
 
     let query = supabase
       .from('properties')
       .select('id, phone, owner_name, building_name, unit_number, rooms, size_sqm, email')
+      .eq('tenant_id', tenant.tenantId)
       .order('id', { ascending: true });
 
-    // Exact or contains filter from the building dropdown
     if (building && building.trim()) {
       query = query.eq('building_name', building.trim());
     }
 
-    // Flexible written search: matches building, owner, unit, or phone (contains / case-insensitive)
     if (search && search.trim()) {
       const term = search.trim();
       const cleanPhone = term.replace(/[\s\-\(\)\.]/g, '');

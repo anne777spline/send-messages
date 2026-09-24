@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { getAuthenticatedTenant, isAuthError } from '@/lib/auth';
+import { createServerSupabase } from '@/lib/supabaseServer';
 
 function cleanPhone(rawPhone: string) {
   if (!rawPhone) return '';
@@ -28,7 +29,7 @@ function parseCSVLine(text: string) {
   return result;
 }
 
-async function upsertBatch(rows: any[]) {
+async function upsertBatch(supabase: any, rows: any[]) {
   if (!rows.length) return;
   const map = new Map();
   for (const r of rows) {
@@ -45,6 +46,18 @@ async function upsertBatch(rows: any[]) {
 }
 
 export async function POST(request: Request) {
+  let tenant;
+  try {
+    tenant = await getAuthenticatedTenant();
+  } catch (e) {
+    if (isAuthError(e)) {
+      return NextResponse.json({ success: false, error: e.message }, { status: e.status });
+    }
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const supabase = createServerSupabase();
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
@@ -71,6 +84,7 @@ export async function POST(request: Request) {
         const phone = cleanPhone(p[9]);
         if (!phone || phone.length < 5) continue;
         batch.push({
+          tenant_id: tenant.tenantId,
           phone,
           owner_name: p[8] || '',
           email: '',
@@ -88,6 +102,7 @@ export async function POST(request: Request) {
         const phone = cleanPhone(p[2]);
         if (!phone || phone.length < 5) continue;
         batch.push({
+          tenant_id: tenant.tenantId,
           phone,
           owner_name: p[1] || '',
           email: p[3] || '',
@@ -98,14 +113,14 @@ export async function POST(request: Request) {
       }
 
       if (batch.length >= 500) {
-        await upsertBatch(batch);
+        await upsertBatch(supabase, batch);
         total += batch.length;
         batch = [];
       }
     }
 
     if (batch.length) {
-      await upsertBatch(batch);
+      await upsertBatch(supabase, batch);
       total += batch.length;
     }
 
