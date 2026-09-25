@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Building2, ArrowLeft } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 export const metadata = {
   title: 'Privacy Policy | Broker Assistant',
@@ -9,34 +10,19 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="min-h-screen bg-[#fafafd] text-gray-900 font-sans flex flex-col justify-between p-6 md:p-12 relative overflow-hidden">
+    <main className="min-h-screen bg-[#fafafd] text-gray-900 font-sans flex flex-col justify-between relative overflow-hidden">
       {/* Soft Pastel Color Blurs */}
-      <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#dbeafe]/70 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[550px] h-[550px] bg-[#ffedd5]/80 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute -bottom-32 right-0 w-[520px] h-[520px] bg-[#fce7f3]/70 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-[#dbeafe]/70 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[650px] h-[650px] bg-[#ffedd5]/80 rounded-full blur-[150px] pointer-events-none" />
 
-      <div className="max-w-4xl mx-auto w-full space-y-8 relative z-10">
+      {/* Persistent Navbar */}
+      <Navbar />
+
+      {/* Page Content */}
+      <div className="w-full max-w-4xl mx-auto px-6 py-12 md:py-16 relative z-10 flex-1 space-y-8">
         
-        {/* Header Navigation */}
-        <header className="flex items-center justify-between pb-6 border-b border-gray-200/80">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Application</span>
-          </Link>
-          
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-gray-900 text-white rounded-lg flex items-center justify-center">
-              <Building2 className="w-4 h-4 text-blue-400" />
-            </div>
-            <span className="font-bold text-gray-900 tracking-tight text-lg">Broker Assistant</span>
-          </div>
-        </header>
-
         {/* Content Container */}
-        <article className="bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-2xl p-8 md:p-10 shadow-xl space-y-8 text-gray-800">
+        <article className="bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 md:p-10 shadow-xl space-y-8 text-gray-800">
           <div className="space-y-2 border-b border-gray-200 pb-6">
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Privacy Policy</h1>
             <p className="text-xs text-gray-500 font-mono">Last updated: 9/25/2026</p>
@@ -92,29 +78,8 @@ export default function PrivacyPolicyPage() {
         </article>
       </div>
 
-      {/* Footer */}
-      <footer className="w-full max-w-4xl mx-auto pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-[#777777] border-t border-gray-200/80 mt-8 relative z-10">
-        <div>
-          <span>Developed by </span>
-          <a
-            href="https://sixtenet.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#555555] hover:text-gray-900 hover:underline transition font-medium"
-          >
-            Six Tenet LLC
-          </a>
-        </div>
-        <div className="flex items-center gap-4">
-          <a href="https://sixtenet.com/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition">About</a>
-          <span>·</span>
-          <Link href="/privacy" className="text-gray-900 font-bold">Privacy</Link>
-          <span>·</span>
-          <Link href="/terms" className="hover:text-gray-900 transition">Terms</Link>
-          <span>·</span>
-          <a href="mailto:legal@sixtenet.com" className="hover:text-gray-900 transition">Help</a>
-        </div>
-      </footer>
+      {/* Persistent Footer */}
+      <Footer />
     </main>
   );
 }

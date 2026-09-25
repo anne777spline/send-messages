@@ -25,6 +25,9 @@ import {
 } from 'lucide-react';
 import { createClientBrowser } from '@/lib/supabaseBrowser';
 
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+
 type WhatsAppStatus = 'not_created' | 'connecting' | 'connected' | 'disconnected' | 'error';
 
 export default function Home() {
@@ -32,6 +35,15 @@ export default function Home() {
   const [session, setSession] = useState<any>(null);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('login') === 'true') {
+        setShowLoginModal(true);
+      }
+    }
+  }, []);
 
   // WhatsApp Connection State
   const [waStatus, setWaStatus] = useState<WhatsAppStatus>('not_created');
@@ -353,39 +365,17 @@ export default function Home() {
   // --- Render Unauthenticated Landing Page (Matches Reference Photo Mood) ---
   if (!session) {
     return (
-      <main className="min-h-screen bg-[#fafafd] text-gray-900 font-sans flex flex-col justify-between relative overflow-hidden">
+      <main className="min-h-screen lg:h-screen lg:max-h-screen bg-[#fafafd] text-gray-900 font-sans flex flex-col justify-between relative overflow-hidden">
         {/* Soft Pastel Color Blurs / Motes */}
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#dbeafe]/70 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute top-10 left-1/3 -translate-x-1/2 w-[550px] h-[550px] bg-[#ffedd5]/80 rounded-full blur-[130px] pointer-events-none" />
         <div className="absolute -bottom-32 right-0 w-[520px] h-[520px] bg-[#fce7f3]/70 rounded-full blur-[130px] pointer-events-none" />
 
         {/* Top Navigation Bar */}
-        <header className="w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between relative z-20">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center shadow-md">
-              <Building2 className="w-5 h-5 text-blue-400" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-gray-900">Broker Assistant</span>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-            <a href="#overview" className="hover:text-gray-900 transition">Overview</a>
-            <a href="#features" className="hover:text-gray-900 transition">Features</a>
-            <a href="#workspace" className="hover:text-gray-900 transition">Workspace</a>
-            <a href="#services" className="hover:text-gray-900 transition">Services</a>
-          </nav>
-
-          <button
-            onClick={() => setShowLoginModal(true)}
-            className="bg-gray-900 hover:bg-black text-white font-medium px-6 py-2.5 rounded-full text-sm flex items-center gap-2 transition shadow-md hover:shadow-lg cursor-pointer"
-          >
-            <span>Login</span>
-            <ArrowRight className="w-4 h-4 text-gray-300" />
-          </button>
-        </header>
+        <Navbar onLoginClick={() => setShowLoginModal(true)} />
 
         {/* Hero Section */}
-        <section className="w-full max-w-7xl mx-auto px-6 py-8 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 flex-1">
+        <section className="w-full max-w-7xl mx-auto px-6 py-2 md:py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10 flex-1 my-auto">
 
           {/* Left Column: Headline & Action */}
           <div className="lg:col-span-6 space-y-8">
@@ -464,7 +454,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-900">Owner Verified</p>
-                    <p className="text-[11px] text-gray-500 font-mono">+971 58 855 9533</p>
+                    <p className="text-[11px] text-gray-500 font-mono">+971 55 888 1111</p>
                   </div>
                 </div>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Matched</span>
@@ -508,24 +498,15 @@ export default function Home() {
               </button>
 
               <div className="text-center space-y-2 pt-2">
-                <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mx-auto text-blue-400 shadow-inner">
-                  <Building2 className="w-8 h-8" />
-                </div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Broker Assistant</h2>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Login</h2>
                 <p className="text-sm text-[#999999]">
                   Sign in to access your property portfolio and WhatsApp messaging.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#252525] rounded-xl border border-[#333333] space-y-2 text-xs text-[#aaaaaa]">
-                <div className="flex items-center gap-2 text-white font-medium">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Private & Secure Workspace</span>
-                </div>
-                <p>
-                  Your property listings, owner contacts, and WhatsApp messages are strictly private to your broker account.
-                </p>
-              </div>
+              <p className="text-[11px] text-[#888888] text-center leading-relaxed px-2">
+                Your property listings, owner contacts, and WhatsApp messages are strictly private to your broker account.
+              </p>
 
               <button
                 onClick={handleGoogleSignIn}
@@ -555,36 +536,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Minimalist Footer like Google Labs (KEPT EXACTLY AS BEFORE) */}
-        <footer className="w-full max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-[#777777] border-t border-gray-200/80 relative z-20">
-          <div>
-            <span>Developed by </span>
-            <a
-              href="https://sixtenet.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#555555] hover:text-gray-900 hover:underline transition font-medium"
-            >
-              Six Tenet LLC
-            </a>
-          </div>
-          <div className="flex items-center gap-4">
-            <a
-              href="https://sixtenet.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gray-900 transition"
-            >
-              About
-            </a>
-            <span>·</span>
-            <Link href="/privacy" className="hover:text-gray-900 transition">Privacy</Link>
-            <span>·</span>
-            <Link href="/terms" className="hover:text-gray-900 transition">Terms</Link>
-            <span>·</span>
-            <a href="mailto:legal@sixtenet.com" className="hover:text-gray-900 transition">Help</a>
-          </div>
-        </footer>
+        {/* Minimalist Footer */}
+        <Footer />
       </main>
     );
   }
