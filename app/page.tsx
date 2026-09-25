@@ -55,8 +55,17 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 1. Session Check & Auth Listener
+  // 1. Handle fallback ?code= redirect & Session Check & Auth Listener
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      if (code) {
+        window.location.href = `/api/auth/callback?code=${code}`;
+        return;
+      }
+    }
+
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       setAuthChecking(false);

@@ -7,8 +7,12 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
 
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
+  const proto = request.headers.get('x-forwarded-proto') || 'https';
+  const baseUrl = host ? `${proto}://${host}` : origin;
+
   if (!code) {
-    return NextResponse.redirect(`${origin}/?error=missing_code`);
+    return NextResponse.redirect(`${baseUrl}/?error=missing_code`);
   }
 
   // Next.js 15: cookies() es async
@@ -39,7 +43,7 @@ export async function GET(request: Request) {
 
   if (error || !data.user) {
     console.error('[auth/callback] Error exchanging code:', error?.message);
-    return NextResponse.redirect(`${origin}/?error=auth_failed`);
+    return NextResponse.redirect(`${baseUrl}/?error=auth_failed`);
   }
 
   const user = data.user;
@@ -64,7 +68,7 @@ export async function GET(request: Request) {
 
     if (tenantError || !tenant) {
       console.error('[auth/callback] Error creating tenant:', tenantError?.message);
-      return NextResponse.redirect(`${origin}/?error=tenant_creation_failed`);
+      return NextResponse.redirect(`${baseUrl}/?error=tenant_creation_failed`);
     }
 
     await admin.from('tenant_users').insert({
@@ -74,5 +78,5 @@ export async function GET(request: Request) {
     });
   }
 
-  return NextResponse.redirect(origin);
+  return NextResponse.redirect(baseUrl);
 }
