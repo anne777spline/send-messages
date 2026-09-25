@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import {
   Search,
   Building2,
@@ -27,7 +28,7 @@ export default function Home() {
   const [session, setSession] = useState<any>(null);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
 
-  // WhatsApp Instance State
+  // WhatsApp Connection State
   const [waStatus, setWaStatus] = useState<WhatsAppStatus>('not_created');
   const [waInstanceName, setWaInstanceName] = useState<string>('');
   const [waQrCode, setWaQrCode] = useState<string | null>(null);
@@ -36,12 +37,12 @@ export default function Home() {
   const [waLoading, setWaLoading] = useState<boolean>(false);
   const [waError, setWaError] = useState<string | null>(null);
 
-  // Properties & Campaign State
+  // Properties & Messaging State
   const [buildings, setBuildings] = useState<string[]>([]);
   const [selectedBuilding, setSelectedBuilding] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [template, setTemplate] = useState<string>(
-    "Good day {owner_name}, I hope you're doing well. Reaching out from Six Tenet regarding your property in {building_name} (Unit {unit_number})."
+    "Good day {owner_name}, I hope you're doing well. Reaching out regarding your property in {building_name} (Unit {unit_number})."
   );
   const [results, setResults] = useState<any[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -55,7 +56,7 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 1. Handle fallback ?code= redirect & Session Check & Auth Listener
+  // 1. Session Check, URL Code Handler & Auth Listener
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -279,7 +280,7 @@ export default function Home() {
     if (waStatus !== 'connected') {
       setDispatchResult({
         success: false,
-        error: 'WhatsApp is not connected. Please connect your WhatsApp instance before dispatching.'
+        error: 'Please link your WhatsApp account before sending messages.'
       });
       return;
     }
@@ -338,7 +339,7 @@ export default function Home() {
       <main className="min-h-screen bg-[#181818] flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-3 text-[#888888]">
           <RefreshCw className="w-8 h-8 animate-spin text-blue-500" />
-          <p className="text-sm font-medium">Verifying authenticated session...</p>
+          <p className="text-sm font-medium">Checking session...</p>
         </div>
       </main>
     );
@@ -347,88 +348,122 @@ export default function Home() {
   // --- Render Login Screen if Not Authenticated ---
   if (!session) {
     return (
-      <main className="min-h-screen bg-[#121212] text-[#e1e1e1] flex items-center justify-center p-4 relative overflow-hidden">
+      <main className="min-h-screen bg-[#121212] text-[#e1e1e1] flex flex-col justify-between p-6 relative overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-md w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-2xl p-8 shadow-2xl relative z-10 space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mx-auto text-blue-400">
-              <Building2 className="w-8 h-8" />
+        {/* Center Container */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="max-w-md w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-2xl p-8 shadow-2xl relative z-10 space-y-6">
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mx-auto text-blue-400 shadow-inner">
+                <Building2 className="w-8 h-8" />
+              </div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">Broker Assistant</h1>
+              <p className="text-sm text-[#999999]">
+                Search property owners, manage building portfolios, and send direct WhatsApp messages.
+              </p>
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Six Tenet Dispatcher</h1>
-            <p className="text-sm text-[#999999]">
-              Multi-tenant WhatsApp campaign manager with isolated instance routing.
-            </p>
-          </div>
 
-          <div className="p-4 bg-[#252525] rounded-xl border border-[#333333] space-y-2.5 text-xs text-[#aaaaaa]">
-            <div className="flex items-center gap-2 text-white font-medium">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Multi-Tenant Architecture</span>
+            <div className="p-4 bg-[#252525] rounded-xl border border-[#333333] space-y-2 text-xs text-[#aaaaaa]">
+              <div className="flex items-center gap-2 text-white font-medium">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Private & Secure Workspace</span>
+              </div>
+              <p>
+                Your property listings, owner contacts, and WhatsApp messages are strictly private to your broker account.
+              </p>
             </div>
-            <p>
-              Your data, properties, and WhatsApp instance are completely isolated to your authenticated account.
-            </p>
-          </div>
 
-          <button
-            onClick={handleGoogleSignIn}
-            className="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-3 transition shadow-md"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-              />
-            </svg>
-            <span>Sign in with Google</span>
-          </button>
+            <button
+              onClick={handleGoogleSignIn}
+              className="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-3 transition shadow-md cursor-pointer"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>Sign in with Google</span>
+            </button>
+          </div>
         </div>
+
+        {/* Minimalist Footer like Google Labs */}
+        <footer className="w-full max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-[#777777] border-t border-[#1f1f1f]">
+          <div>
+            <span>Developed by </span>
+            <a
+              href="https://sixtenet.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#999999] hover:text-white hover:underline transition font-medium"
+            >
+              Six Tenet LLC
+            </a>
+          </div>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://sixtenet.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition"
+            >
+              About
+            </a>
+            <span>·</span>
+            <Link href="/privacy" className="hover:text-white transition">Privacy</Link>
+            <span>·</span>
+            <Link href="/terms" className="hover:text-white transition">Terms</Link>
+            <span>·</span>
+            <a href="mailto:legal@sixtenet.com" className="hover:text-white transition">Help</a>
+          </div>
+        </footer>
       </main>
     );
   }
 
   // --- Render Authenticated Dashboard ---
   return (
-    <main className="min-h-screen bg-[#181818] text-[#e1e1e1] p-4 md:p-8 font-sans text-base">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <main className="min-h-screen bg-[#181818] text-[#e1e1e1] p-4 md:p-8 font-sans text-base flex flex-col justify-between">
+      <div className="max-w-7xl mx-auto w-full space-y-6 flex-1">
 
         {/* Top Header with User Info & Sign Out */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-[#2e2e2e] gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-semibold text-white flex items-center gap-3">
               <Building2 className="w-8 h-8 text-blue-500 flex-shrink-0" />
-              <span>Six Tenet Campaign Dispatcher</span>
+              <span>Broker Assistant</span>
             </h1>
             <p className="text-[#999999] text-sm md:text-base mt-1">
-              Multi-tenant contact search, building filters, and automated WhatsApp delivery.
+              Search property owners, filter buildings, and deliver direct WhatsApp messages.
             </p>
           </div>
 
           <div className="flex items-center gap-3 bg-[#222222] border border-[#333333] px-3.5 py-2 rounded-xl text-xs">
             <div className="flex flex-col text-right">
-              <span className="text-white font-medium truncate max-w-[200px]">{session.user.email}</span>
-              <span className="text-[#888888] font-mono text-[10px]">
-                {waInstanceName ? `Tenant: ${waInstanceName}` : 'Tenant Session Active'}
+              <span className="text-white font-medium truncate max-w-[220px]">{session.user.email}</span>
+              <span className="text-[#888888] text-[11px] flex items-center justify-end gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" /> Broker Account
               </span>
             </div>
             <button
               onClick={handleSignOut}
               title="Sign Out"
-              className="p-1.5 text-[#888888] hover:text-red-400 hover:bg-[#2b2b2b] rounded-lg transition"
+              className="p-1.5 text-[#888888] hover:text-red-400 hover:bg-[#2b2b2b] rounded-lg transition ml-1"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -445,7 +480,7 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                   <Smartphone className="w-5 h-5 text-emerald-400" />
-                  <span>WhatsApp Instance</span>
+                  <span>WhatsApp Connection</span>
                 </h2>
                 {waStatus === 'connected' ? (
                   <span className="text-xs bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2.5 py-1 rounded-full font-medium flex items-center gap-1.5">
@@ -453,11 +488,11 @@ export default function Home() {
                   </span>
                 ) : waStatus === 'connecting' ? (
                   <span className="text-xs bg-amber-950/80 text-amber-300 border border-amber-700/60 px-2.5 py-1 rounded-full font-medium flex items-center gap-1.5">
-                    <RefreshCw className="w-3 h-3 animate-spin text-amber-400" /> Scanning...
+                    <RefreshCw className="w-3 h-3 animate-spin text-amber-400" /> Waiting for scan...
                   </span>
                 ) : (
                   <span className="text-xs bg-[#2b2b2b] text-[#888888] px-2.5 py-1 rounded-full font-medium">
-                    Disconnected
+                    Not Connected
                   </span>
                 )}
               </div>
@@ -465,15 +500,15 @@ export default function Home() {
               {waStatus === 'connected' ? (
                 <div className="bg-[#1b2a1e] border border-[#2e5235] rounded-lg p-3 text-xs text-[#a3e635] space-y-1">
                   <p className="font-semibold text-emerald-300 flex items-center gap-1.5">
-                    <CheckCircle className="w-4 h-4 text-emerald-400" /> Ready to dispatch campaigns
+                    <CheckCircle className="w-4 h-4 text-emerald-400" /> WhatsApp connected & ready
                   </p>
                   <p className="text-[#888888]">
-                    Instance: <span className="font-mono text-white">{waInstanceName}</span>
+                    Messages will be sent directly from your linked phone number.
                   </p>
                 </div>
               ) : (
                 <p className="text-xs text-[#888888]">
-                  Connect your WhatsApp account to route campaigns through your dedicated instance.
+                  Link your phone to send messages directly to property owners from your WhatsApp account.
                 </p>
               )}
 
@@ -493,7 +528,7 @@ export default function Home() {
                       <QrCodeIcon className="w-4 h-4 text-blue-400" /> Scan QR with WhatsApp
                     </p>
                     <p className="text-[11px] text-[#888888]">
-                      Settings → Linked Devices → Link a Device
+                      WhatsApp → Settings → Linked Devices → Link a Device
                     </p>
                     {waQrCountdown > 0 && (
                       <p className="text-[11px] text-amber-400 font-mono">
@@ -515,7 +550,7 @@ export default function Home() {
                 type="button"
                 onClick={handleConnectWhatsApp}
                 disabled={waLoading}
-                className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition"
+                className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition cursor-pointer"
               >
                 {waLoading ? (
                   <>
@@ -525,17 +560,17 @@ export default function Home() {
                 ) : waStatus === 'connected' ? (
                   <>
                     <RefreshCw className="w-4 h-4 text-emerald-400" />
-                    <span>Refresh Connection</span>
+                    <span>WhatsApp Linked (Click to Refresh)</span>
                   </>
                 ) : waStatus === 'connecting' ? (
                   <>
                     <RefreshCw className="w-4 h-4 text-blue-400" />
-                    <span>Generate New QR Code</span>
+                    <span>Refresh QR Code</span>
                   </>
                 ) : (
                   <>
                     <Smartphone className="w-4 h-4 text-emerald-400" />
-                    <span>Connect WhatsApp</span>
+                    <span>Link WhatsApp Account</span>
                   </>
                 )}
               </button>
@@ -546,12 +581,12 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                   <Upload className="w-5 h-5 text-blue-400" />
-                  Import CSV Listings
+                  <span>Import Property Listings</span>
                 </h2>
-                <span className="text-xs bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded">CSV only</span>
+                <span className="text-xs bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded">CSV Spreadsheet</span>
               </div>
               <p className="text-xs text-[#888888]">
-                Upload CSV files to add or update landlords and properties directly to your tenant database.
+                Upload your CSV spreadsheet to add or update your property and owner listings.
               </p>
               <input
                 type="file"
@@ -563,7 +598,7 @@ export default function Home() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2.5 transition shadow-sm"
+                className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2.5 transition shadow-sm cursor-pointer"
               >
                 {uploading ? (
                   <>
@@ -573,7 +608,7 @@ export default function Home() {
                 ) : (
                   <>
                     <FileText className="w-4 h-4 text-blue-400" />
-                    <span>Select & Upload CSV File</span>
+                    <span>Upload CSV File</span>
                   </>
                 )}
               </button>
@@ -589,9 +624,9 @@ export default function Home() {
                     <>
                       <CheckCircle className="w-5 h-5 flex-shrink-0 text-emerald-400 mt-0.5" />
                       <div>
-                        <p className="font-medium text-emerald-300">Import Successful!</p>
+                        <p className="font-medium text-emerald-300">Properties Imported!</p>
                         <p className="text-xs text-[#a3e635] mt-0.5">
-                          {importResult.total_processed} record(s) processed and synced.
+                          {importResult.total_processed} record(s) processed and added to your portfolio.
                         </p>
                       </div>
                     </>
@@ -612,11 +647,11 @@ export default function Home() {
             <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
               <h2 className="text-lg font-semibold text-white">Message Template</h2>
               <p className="text-xs text-[#888888]">
-                Insert dynamic variables into your message template:
+                Click tags to insert owner or property details automatically:
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {[
-                  { tag: 'owner_name', label: '+ Landlord Name' },
+                  { tag: 'owner_name', label: '+ Owner Name' },
                   { tag: 'building_name', label: '+ Building' },
                   { tag: 'unit_number', label: '+ Unit' },
                   { tag: 'rooms', label: '+ Rooms' }
@@ -625,7 +660,7 @@ export default function Home() {
                     key={item.tag}
                     type="button"
                     onClick={() => insertTag(item.tag)}
-                    className="bg-[#2b2b2b] hover:bg-[#383838] text-blue-400 text-xs px-2.5 py-1.5 rounded border border-[#3d3d3d] transition"
+                    className="bg-[#2b2b2b] hover:bg-[#383838] text-blue-400 text-xs px-2.5 py-1.5 rounded border border-[#3d3d3d] transition cursor-pointer"
                   >
                     {item.label}
                   </button>
@@ -643,13 +678,13 @@ export default function Home() {
                 type="button"
                 onClick={handleDispatch}
                 disabled={sending || selectedIds.size === 0}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-40 disabled:hover:bg-emerald-600 text-white font-medium py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-sm"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-40 disabled:hover:bg-emerald-600 text-white font-medium py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
               >
                 {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 <span>
                   {sending
-                    ? 'Dispatching via n8n...'
-                    : `Send WhatsApp Campaign (${selectedIds.size.toLocaleString()} selected)`}
+                    ? 'Sending Messages...'
+                    : `Send WhatsApp Messages (${selectedIds.size.toLocaleString()} selected)`}
                 </span>
               </button>
 
@@ -663,13 +698,13 @@ export default function Home() {
                   {dispatchResult.success ? (
                     <div className="space-y-1">
                       <p className="font-semibold flex items-center gap-1.5 text-emerald-300">
-                        <CheckCircle className="w-4 h-4" /> Campaign successfully dispatched!
+                        <CheckCircle className="w-4 h-4" /> Messages successfully sent!
                       </p>
-                      <p>Total sent: {dispatchResult.total_sent} leads to n8n webhook.</p>
+                      <p>Total: {dispatchResult.total_sent} messages queued for delivery.</p>
                       <p className="text-[#888888] italic truncate">Sample: &quot;{dispatchResult.sample_message}&quot;</p>
                     </div>
                   ) : (
-                    <p>Error dispatching campaign: {dispatchResult.error}</p>
+                    <p>Error sending messages: {dispatchResult.error}</p>
                   )}
                 </div>
               )}
@@ -677,15 +712,15 @@ export default function Home() {
 
           </div>
 
-          {/* Right Column: Filters & Lookup on top of Search Results Table */}
+          {/* Right Column: Search Bar & Results Table */}
           <div className="lg:col-span-2 space-y-6">
 
-            {/* Minimalist Inline Search Bar */}
+            {/* Inline Search Bar */}
             <form onSubmit={handleSearch} className="bg-[#222222] border border-[#333333] rounded-xl p-3 flex flex-col sm:flex-row items-center gap-3">
               <div className="relative flex-1 w-full">
                 <input
                   type="text"
-                  placeholder="Search by building, owner, phone, unit..."
+                  placeholder="Search by building, owner name, phone, unit..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-4 py-2.5 text-sm text-white placeholder-[#666666] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -724,7 +759,7 @@ export default function Home() {
                 type="submit"
                 disabled={loading}
                 title="Search Properties"
-                className="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-50 text-white p-2.5 rounded-lg flex items-center justify-center transition shadow-sm flex-shrink-0 w-full sm:w-11 h-10"
+                className="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-50 text-white p-2.5 rounded-lg flex items-center justify-center transition shadow-sm flex-shrink-0 w-full sm:w-11 h-10 cursor-pointer"
               >
                 {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
               </button>
@@ -735,7 +770,7 @@ export default function Home() {
                   type="button"
                   onClick={handleClearFilters}
                   title="Clear all filters"
-                  className="text-[#888888] hover:text-white hover:bg-[#2d2d2d] p-2.5 rounded-lg transition flex items-center justify-center flex-shrink-0 w-full sm:w-10 h-10"
+                  className="text-[#888888] hover:text-white hover:bg-[#2d2d2d] p-2.5 rounded-lg transition flex items-center justify-center flex-shrink-0 w-full sm:w-10 h-10 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -747,9 +782,9 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#2d2d2d] pb-4 gap-2">
                 <div className="flex items-center gap-3">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                    <span>Search Results</span>
+                    <span>Properties Found</span>
                     <span className="text-xs bg-[#2b2b2b] text-blue-400 px-2.5 py-0.5 rounded-full font-mono">
-                      {results.length.toLocaleString()} found
+                      {results.length.toLocaleString()}
                     </span>
                   </h2>
                   {results.length > 0 && (
@@ -764,14 +799,14 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={toggleSelectAll}
-                      className="text-xs bg-[#2d2d2d] hover:bg-[#383838] border border-[#444444] px-2.5 py-1 rounded text-[#cccccc] hover:text-white transition"
+                      className="text-xs bg-[#2d2d2d] hover:bg-[#383838] border border-[#444444] px-2.5 py-1 rounded text-[#cccccc] hover:text-white transition cursor-pointer"
                     >
                       {isAllSelected ? 'Deselect All' : 'Select All'}
                     </button>
                     <button
                       type="button"
                       onClick={handleClearFilters}
-                      className="text-xs text-[#888888] hover:text-white transition ml-2"
+                      className="text-xs text-[#888888] hover:text-white transition ml-2 cursor-pointer"
                     >
                       Clear results
                     </button>
@@ -782,18 +817,18 @@ export default function Home() {
               {loading ? (
                 <div className="flex-1 flex flex-col items-center justify-center py-20 text-[#888888] space-y-3">
                   <RefreshCw className="w-8 h-8 animate-spin text-blue-400" />
-                  <p className="text-sm">Querying database...</p>
+                  <p className="text-sm">Loading properties...</p>
                 </div>
               ) : results.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center py-20 text-[#777777] space-y-3">
                   <Search className="w-12 h-12 stroke-[1.5] text-[#444444]" />
                   <p className="text-base text-[#aaaaaa]">
                     {hasSearched
-                      ? 'No records match your search criteria.'
-                      : 'Search by keyword (e.g. Luma, Binghatti, phone) or select a building above.'}
+                      ? 'No properties found matching your search.'
+                      : 'Search by keyword (e.g. building name, owner, phone) or select a building above.'}
                   </p>
                   <p className="text-xs text-[#666666] max-w-sm text-center">
-                    Tip: You can use the checkboxes to pick exactly who receives the message before sending.
+                    Tip: Select properties using the checkboxes to send them a personalized message.
                   </p>
                 </div>
               ) : (
@@ -812,7 +847,7 @@ export default function Home() {
                             className="w-4 h-4 rounded border-[#444444] bg-[#222222] text-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
                           />
                         </th>
-                        <th className="py-3 px-4 font-medium">Landlord Name</th>
+                        <th className="py-3 px-4 font-medium">Owner Name</th>
                         <th className="py-3 px-4 font-medium">Phone Number</th>
                         <th className="py-3 px-4 font-medium">Building</th>
                         <th className="py-3 px-4 font-medium">Unit</th>
@@ -897,6 +932,37 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Subtle Footer on Dashboard */}
+      <footer className="w-full max-w-7xl mx-auto pt-8 pb-2 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-[#666666]">
+        <div>
+          <span>Developed by </span>
+          <a
+            href="https://sixtenet.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#888888] hover:text-white hover:underline transition font-medium"
+          >
+            Six Tenet LLC
+          </a>
+        </div>
+        <div className="flex items-center gap-4">
+          <a
+            href="https://sixtenet.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition"
+          >
+            About
+          </a>
+          <span>·</span>
+          <Link href="/privacy" className="hover:text-white transition">Privacy</Link>
+          <span>·</span>
+          <Link href="/terms" className="hover:text-white transition">Terms</Link>
+          <span>·</span>
+          <a href="mailto:legal@sixtenet.com" className="hover:text-white transition">Help</a>
+        </div>
+      </footer>
     </main>
   );
 }
