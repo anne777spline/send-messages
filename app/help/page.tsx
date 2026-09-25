@@ -45,7 +45,7 @@ export default function HelpPage() {
               <span>2. How do I upload my property listings?</span>
             </h2>
             <p className="text-sm text-gray-700 leading-relaxed">
-              Click <strong>&quot;Upload CSV File&quot;</strong> in the portal sidebar. Your CSV file should contain columns for landlord name, phone number, building name, unit number, and rooms. The platform automatically parses and upserts these records into your dedicated tenant database.
+              Click <strong>&quot;Upload CSV File&quot;</strong> in the portal sidebar. Your CSV file should contain columns for landlord name, phone number, building name, unit number, and rooms. The platform automatically parses and upserts these records into your dedicated broker database.
             </p>
           </section>
 
@@ -55,7 +55,7 @@ export default function HelpPage() {
               <span>3. Are my uploaded contacts kept private?</span>
             </h2>
             <p className="text-sm text-gray-700 leading-relaxed">
-              Yes, 100%. Every brokerage account is protected by strict database Row-Level Security (RLS). Your listings, owner phone numbers, and campaign logs can only be accessed by authenticated users belonging to your specific tenant.
+              Yes, 100%. Every brokerage account is protected by strict database security policies. Your listings, owner phone numbers, and campaign logs can only be accessed by authenticated users belonging to your specific brokerage account.
             </p>
           </section>
 

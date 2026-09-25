@@ -59,7 +59,7 @@ export default function OverviewPage() {
                 <h2 className="text-xl font-bold text-white tracking-tight">Bulk Portfolio CSV Import</h2>
               </div>
               <p className="text-xs text-gray-300 leading-relaxed">
-                Upload your landlord lists and building property records in bulk via CSV spreadsheets. Your contacts are parsed automatically and stored securely in your private tenant database.
+                Upload your landlord lists and building property records in bulk via CSV spreadsheets. Your contacts are parsed automatically and stored securely in your private broker database.
               </p>
               <div className="bg-gray-900/90 border border-gray-800 p-3 rounded-xl font-mono text-[11px] text-gray-400 flex items-center justify-between">
                 <span>owner_name, phone, building</span>

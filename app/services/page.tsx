@@ -37,9 +37,9 @@ export default function ServicesPage() {
             <div className="w-14 h-14 bg-amber-50 text-amber-700 rounded-2xl flex items-center justify-center font-bold border border-amber-100">
               <ShieldCheck className="w-7 h-7" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Tenant Data Isolation</h2>
+            <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Brokerage Data Privacy</h2>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Database Row-Level Security (RLS) policies guarantee that your brokerage portfolio remains strictly confidential and accessible only by your tenant.
+              Strict database security policies guarantee that your landlord contact portfolio and building records remain 100% private and accessible only by your brokerage account.
             </p>
           </div>
 

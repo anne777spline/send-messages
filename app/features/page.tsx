@@ -40,7 +40,7 @@ export default function FeaturesPage() {
               </div>
               <h2 className="text-2xl font-bold text-gray-950 tracking-tight">1-Click CSV Portfolio Import</h2>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Upload raw CSV files containing landlord names, phone numbers, unit numbers, and building details. Our automated parser organizes and updates your dedicated tenant database instantly.
+                Upload raw CSV files containing landlord names, phone numbers, unit numbers, and building details. Our automated parser organizes and updates your dedicated broker database instantly.
               </p>
             </div>
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200/80 font-mono text-xs text-gray-600 flex items-center justify-between">
