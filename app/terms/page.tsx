@@ -1,12 +1,9 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-
-export const metadata = {
-  title: 'Terms of Service | Broker Assistant',
-  description: 'Terms of Service for Broker Assistant by Six Tenet LLC',
-};
 
 export default function TermsPage() {
   return (

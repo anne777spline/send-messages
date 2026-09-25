@@ -1,13 +1,10 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Smartphone, FileSpreadsheet, ShieldCheck, HelpCircle, Mail } from 'lucide-react';
-
-export const metadata = {
-  title: 'Help & Support | Broker Assistant',
-  description: 'Help Center and FAQs for Broker Assistant by Six Tenet LLC',
-};
 
 export default function HelpPage() {
   return (

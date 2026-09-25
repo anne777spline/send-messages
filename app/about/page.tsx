@@ -1,13 +1,10 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Building2, ShieldCheck, Zap, Globe } from 'lucide-react';
-
-export const metadata = {
-  title: 'About | Broker Assistant',
-  description: 'About Broker Assistant by Six Tenet LLC',
-};
 
 export default function AboutPage() {
   return (

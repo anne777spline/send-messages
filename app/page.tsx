@@ -402,8 +402,8 @@ export default function Home() {
             {/* Social Proof Badges (Like in Photo) */}
             <div className="pt-6 border-t border-gray-200/60 flex items-center gap-8 text-xs text-gray-600">
               <div>
-                <p className="text-lg font-bold text-gray-900">60k+</p>
-                <p className="text-gray-500">Property Records</p>
+                <p className="text-lg font-bold text-gray-900">1-Click</p>
+                <p className="text-gray-500">Bulk CSV Upload</p>
               </div>
               <div className="h-8 w-px bg-gray-200" />
               <div>

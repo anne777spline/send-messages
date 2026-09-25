@@ -24,7 +24,6 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
   const navItems = [
     { label: 'Overview', href: '/overview' },
     { label: 'Features', href: '/features' },
-    { label: 'Workspace', href: '/workspace' },
     { label: 'Services', href: '/services' },
   ];
 

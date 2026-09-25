@@ -1,13 +1,10 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Search, MessageSquare, ShieldCheck, CheckCircle2, ArrowRight, Building2, Zap, Layers } from 'lucide-react';
-
-export const metadata = {
-  title: 'Overview | Broker Assistant',
-  description: 'Overview of Broker Assistant platform for real estate brokers',
-};
+import { Upload, MessageSquare, ShieldCheck, CheckCircle2, ArrowRight, Building2, Zap, Layers } from 'lucide-react';
 
 export default function OverviewPage() {
   return (
@@ -21,58 +18,69 @@ export default function OverviewPage() {
       <Navbar />
 
       {/* Page Content Container */}
-      <div className="w-full max-w-7xl mx-auto px-6 py-12 md:py-20 relative z-10 flex-1 space-y-20">
+      <div className="w-full max-w-7xl mx-auto px-6 py-8 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 flex-1 my-auto">
 
-        {/* Page Hero Header */}
-        <div className="max-w-3xl space-y-6">
+        {/* Left Column: Headline & Action */}
+        <div className="lg:col-span-6 space-y-8">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-950 tracking-tight leading-[1.15]">
             Built Specifically For Modern Real Estate Brokers
           </h1>
-          <p className="text-lg text-gray-600 leading-relaxed font-normal">
-            Broker Assistant replaces manual spreadsheet dialing with a centralized contact directory, instant building portfolio search, and automated WhatsApp delivery directly from your own phone number.
+          <p className="text-base sm:text-lg text-gray-600 max-w-xl font-normal leading-relaxed">
+            Broker Assistant allows real estate brokers to upload their landlord contact databases via CSV, organize building portfolios, and send high-volume personalized WhatsApp campaigns directly from their own phone number.
           </p>
           <div className="pt-2 flex flex-wrap gap-4">
             <Link
               href="/?login=true"
-              className="bg-gray-900 hover:bg-black text-white font-medium px-8 py-3.5 rounded-full text-sm flex items-center gap-2 transition shadow-lg cursor-pointer"
+              className="bg-gray-900 hover:bg-black text-white font-medium px-8 py-4 rounded-full text-base flex items-center gap-2 transition shadow-xl hover:shadow-2xl cursor-pointer"
             >
               <span>Access Broker Portal</span>
-              <ArrowRight className="w-4 h-4 text-gray-300" />
+              <ArrowRight className="w-5 h-5 text-gray-300" />
             </Link>
           </div>
         </div>
 
-        {/* Feature Grid Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white/80 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-4 group">
-            <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-bold border border-blue-100 group-hover:scale-110 transition-transform">
-              <Search className="w-7 h-7" />
+        {/* Right Column: Organic Shapes & Black/White Cards (Matches Landing Branding) */}
+        <div className="lg:col-span-6 relative flex flex-col items-center justify-center py-6 min-h-[440px]">
+
+          {/* Top-Right Organic Shape: Green Blob #89c900 */}
+          <div className="absolute top-0 right-2 sm:right-6 w-64 h-64 sm:w-80 sm:h-80 bg-[#89c900] rounded-[70px] transform rotate-12 opacity-95 shadow-xl pointer-events-none transition-transform duration-700 hover:scale-105 z-0" />
+
+          {/* Bottom-Right Organic Shape: Yellow Blob #d8e454 */}
+          <div className="absolute -bottom-4 right-8 sm:right-16 w-64 h-64 sm:w-80 sm:h-80 bg-[#d8e454] rounded-[70px] transform -rotate-12 opacity-95 shadow-xl pointer-events-none transition-transform duration-700 hover:scale-105 z-0" />
+
+          {/* Cards Stack Container */}
+          <div className="relative z-10 w-full max-w-[440px] space-y-5 my-auto">
+            {/* Top Card: Black (#000000) matching Landing Page Card */}
+            <div className="w-full bg-black text-white rounded-[32px] p-6 sm:p-7 shadow-2xl border border-gray-800 space-y-4 transform hover:-translate-y-1 transition duration-300">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold shadow-md">
+                  <Upload className="w-5 h-5" />
+                </div>
+                <h2 className="text-xl font-bold text-white tracking-tight">Bulk Portfolio CSV Import</h2>
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                Upload your landlord lists and building property records in bulk via CSV spreadsheets. Your contacts are parsed automatically and stored securely in your private tenant database.
+              </p>
+              <div className="bg-gray-900/90 border border-gray-800 p-3 rounded-xl font-mono text-[11px] text-gray-400 flex items-center justify-between">
+                <span>owner_name, phone, building</span>
+                <span className="bg-emerald-950 text-emerald-400 border border-emerald-800/80 text-[10px] font-bold px-2 py-0.5 rounded">Auto-Parsed</span>
+              </div>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Instant Building Search</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Filter across 60,000+ property records by building name, owner name, unit number, or room count in milliseconds.
-            </p>
+
+            {/* Bottom Card: White (#ffffff) overlapping slightly */}
+            <div className="w-full bg-white text-gray-900 rounded-[32px] p-6 sm:p-7 shadow-2xl border border-gray-100 space-y-4 transform hover:-translate-y-1 transition duration-300">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center font-bold shadow-md">
+                  <MessageSquare className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-950 tracking-tight">Mass WhatsApp Outreach</h2>
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Dispatch personalized bulk campaigns to hundreds of property owners simultaneously using dynamic variables (<code className="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-mono">&#123;owner_name&#125;</code>, <code className="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-mono">&#123;unit_number&#125;</code>) directly from your linked WhatsApp line.
+              </p>
+            </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-4 group">
-            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center font-bold border border-emerald-100 group-hover:scale-110 transition-transform">
-              <MessageSquare className="w-7 h-7" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Direct WhatsApp Outreach</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Send personalized outreach campaigns to verified property owners directly through your linked WhatsApp account.
-            </p>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-md border border-gray-200/80 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-4 group">
-            <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center font-bold border border-purple-100 group-hover:scale-110 transition-transform">
-              <ShieldCheck className="w-7 h-7" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 tracking-tight">100% Private Database</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Your uploaded listings and owner contacts are isolated with row-level encryption. Only your brokerage account can view or access them.
-            </p>
-          </div>
         </div>
       </div>
 

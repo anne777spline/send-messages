@@ -1,13 +1,10 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ShieldCheck, Upload, Smartphone, CheckCircle2, ArrowRight } from 'lucide-react';
-
-export const metadata = {
-  title: 'Services | Broker Assistant',
-  description: 'Enterprise support and infrastructure for Broker Assistant by Six Tenet LLC',
-};
 
 export default function ServicesPage() {
   return (
@@ -22,12 +19,9 @@ export default function ServicesPage() {
 
       {/* Page Content Container */}
       <div className="w-full max-w-7xl mx-auto px-6 py-12 md:py-20 relative z-10 flex-1 space-y-16">
-        
+
         {/* Page Hero Header */}
         <div className="max-w-3xl space-y-6">
-          <span className="text-xs font-semibold tracking-widest text-amber-600 uppercase bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-100/80 shadow-sm inline-block">
-            Services &amp; Infrastructure
-          </span>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-950 tracking-tight leading-[1.15]">
             Enterprise Support &amp; Data Security
           </h1>
@@ -38,7 +32,7 @@ export default function ServicesPage() {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
+
           <div className="bg-white/90 backdrop-blur-md border border-gray-200/90 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-4">
             <div className="w-14 h-14 bg-amber-50 text-amber-700 rounded-2xl flex items-center justify-center font-bold border border-amber-100">
               <ShieldCheck className="w-7 h-7" />
