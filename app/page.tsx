@@ -17,7 +17,11 @@ import {
   LogOut,
   Smartphone,
   ShieldCheck,
-  QrCode as QrCodeIcon
+  QrCode as QrCodeIcon,
+  MessageSquare,
+  Users,
+  CheckCheck,
+  ArrowRight
 } from 'lucide-react';
 import { createClientBrowser } from '@/lib/supabaseBrowser';
 
@@ -27,6 +31,7 @@ export default function Home() {
   const [supabase] = useState(() => createClientBrowser());
   const [session, setSession] = useState<any>(null);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
+  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
 
   // WhatsApp Connection State
   const [waStatus, setWaStatus] = useState<WhatsAppStatus>('not_created');
@@ -336,81 +341,229 @@ export default function Home() {
   // --- Render Auth Loading ---
   if (authChecking) {
     return (
-      <main className="min-h-screen bg-[#181818] flex items-center justify-center p-4">
-        <div className="flex flex-col items-center gap-3 text-[#888888]">
-          <RefreshCw className="w-8 h-8 animate-spin text-blue-500" />
+      <main className="min-h-screen bg-[#fafafa] flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3 text-gray-500">
+          <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
           <p className="text-sm font-medium">Checking session...</p>
         </div>
       </main>
     );
   }
 
-  // --- Render Login Screen if Not Authenticated ---
+  // --- Render Unauthenticated Landing Page (Matches Reference Photo Mood) ---
   if (!session) {
     return (
-      <main className="min-h-screen bg-[#121212] text-[#e1e1e1] flex flex-col justify-between p-6 relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+      <main className="min-h-screen bg-[#fafafd] text-gray-900 font-sans flex flex-col justify-between relative overflow-hidden">
+        {/* Soft Pastel Color Blurs / Motes */}
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#dbeafe]/70 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-10 left-1/3 -translate-x-1/2 w-[550px] h-[550px] bg-[#ffedd5]/80 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute -bottom-32 right-0 w-[520px] h-[520px] bg-[#fce7f3]/70 rounded-full blur-[130px] pointer-events-none" />
 
-        {/* Center Container */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="max-w-md w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-2xl p-8 shadow-2xl relative z-10 space-y-6">
-            <div className="text-center space-y-2">
-              <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mx-auto text-blue-400 shadow-inner">
-                <Building2 className="w-8 h-8" />
-              </div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">Broker Assistant</h1>
-              <p className="text-sm text-[#999999]">
-                Search property owners, manage building portfolios, and send direct WhatsApp messages.
-              </p>
+        {/* Top Navigation Bar */}
+        <header className="w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between relative z-20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center shadow-md">
+              <Building2 className="w-5 h-5 text-blue-400" />
             </div>
-
-            <div className="p-4 bg-[#252525] rounded-xl border border-[#333333] space-y-2 text-xs text-[#aaaaaa]">
-              <div className="flex items-center gap-2 text-white font-medium">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Private & Secure Workspace</span>
-              </div>
-              <p>
-                Your property listings, owner contacts, and WhatsApp messages are strictly private to your broker account.
-              </p>
-            </div>
-
-            <button
-              onClick={handleGoogleSignIn}
-              className="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-3 transition shadow-md cursor-pointer"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                />
-              </svg>
-              <span>Sign in with Google</span>
-            </button>
+            <span className="text-xl font-bold tracking-tight text-gray-900">Broker Assistant</span>
           </div>
-        </div>
 
-        {/* Minimalist Footer like Google Labs */}
-        <footer className="w-full max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-[#777777] border-t border-[#1f1f1f]">
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+            <a href="#overview" className="hover:text-gray-900 transition">Overview</a>
+            <a href="#features" className="hover:text-gray-900 transition">Features</a>
+            <a href="#workspace" className="hover:text-gray-900 transition">Workspace</a>
+            <a href="#services" className="hover:text-gray-900 transition">Services</a>
+          </nav>
+
+          <button
+            onClick={() => setShowLoginModal(true)}
+            className="bg-gray-900 hover:bg-black text-white font-medium px-6 py-2.5 rounded-full text-sm flex items-center gap-2 transition shadow-md hover:shadow-lg cursor-pointer"
+          >
+            <span>Login</span>
+            <ArrowRight className="w-4 h-4 text-gray-300" />
+          </button>
+        </header>
+
+        {/* Hero Section */}
+        <section className="w-full max-w-7xl mx-auto px-6 py-8 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 flex-1">
+
+          {/* Left Column: Headline & Action */}
+          <div className="lg:col-span-6 space-y-8">
+            <h1 className="font-pagani text-4xl sm:text-5xl lg:text-6xl font-light text-gray-950 leading-[1.12] tracking-tight">
+              An easier <br />
+              <span className="font-serif-accent italic font-normal text-black text-[1.08em]">Direct Outreach</span> <br />
+              <span className="font-normal text-gray-900">for Brokers</span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-gray-600 max-w-lg font-normal leading-relaxed">
+              Search building portfolios, contact property owners directly, and deliver personalized WhatsApp messages from your own number.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="bg-gray-900 hover:bg-black text-white font-semibold px-8 py-4 rounded-2xl text-base flex items-center justify-center gap-3 transition shadow-xl hover:shadow-2xl cursor-pointer"
+              >
+                <span>Access Broker Portal</span>
+                <ArrowRight className="w-5 h-5 text-gray-300" />
+              </button>
+            </div>
+
+            {/* Social Proof Badges (Like in Photo) */}
+            <div className="pt-6 border-t border-gray-200/60 flex items-center gap-8 text-xs text-gray-600">
+              <div>
+                <p className="text-lg font-bold text-gray-900">60k+</p>
+                <p className="text-gray-500">Property Records</p>
+              </div>
+              <div className="h-8 w-px bg-gray-200" />
+              <div>
+                <p className="text-lg font-bold text-gray-900">100%</p>
+                <p className="text-gray-500">Private Account Data</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Organic Shapes & Black Card (Matches Photo Design) */}
+          <div className="lg:col-span-6 relative flex justify-center items-center py-6">
+
+            {/* Green Rounded Triangle/Blob #89c900 */}
+            <div className="absolute -top-4 right-6 sm:right-12 w-72 h-72 sm:w-80 sm:h-80 bg-[#89c900] rounded-[70px] transform rotate-12 opacity-95 shadow-lg pointer-events-none transition-transform duration-700 hover:scale-105" />
+
+            {/* Yellow Rounded Triangle/Blob #d8e454 */}
+            <div className="absolute -bottom-4 left-6 sm:left-12 w-72 h-72 sm:w-80 sm:h-80 bg-[#d8e454] rounded-[70px] transform -rotate-12 opacity-95 shadow-lg pointer-events-none transition-transform duration-700 hover:scale-105" />
+
+            {/* Black Card (#000000) Overlapping Shapes */}
+            <div className="w-full max-w-[380px] bg-black text-white rounded-[36px] p-6 sm:p-7 shadow-2xl relative z-10 border border-gray-800 space-y-6">
+
+              {/* Card Top Badge */}
+              <div className="flex items-center justify-between border-b border-gray-800 pb-4">
+                <div className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shadow-md">
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
+                <span className="bg-emerald-950 text-emerald-400 border border-emerald-800/80 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5">
+                  <CheckCheck className="w-3.5 h-3.5" /> Ready
+                </span>
+              </div>
+
+              {/* Card Message Preview */}
+              <div className="space-y-3">
+                <p className="text-xs text-gray-400 font-medium tracking-wide uppercase">WhatsApp Preview</p>
+                <h3 className="text-2xl font-bold tracking-tight text-white leading-snug">
+                  Direct Owner Outreach
+                </h3>
+                <p className="text-xs text-gray-300 leading-relaxed bg-gray-900/90 border border-gray-800 p-3.5 rounded-2xl">
+                  &quot;Good day Sir, reaching out regarding your property in Binghatti Emerald (Unit 777).&quot;
+                </p>
+              </div>
+
+              {/* Floating White Card (Like Reference Photo) */}
+              <div className="bg-white text-gray-900 rounded-2xl p-3.5 shadow-xl flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                    ✓
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-900">Owner Verified</p>
+                    <p className="text-[11px] text-gray-500 font-mono">+971 58 855 9533</p>
+                  </div>
+                </div>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Matched</span>
+              </div>
+
+              {/* Contacts Cards (White cards with photos as per design reference) */}
+              <div className="space-y-2 pt-1">
+                <p className="text-[11px] text-gray-400 font-medium tracking-wide">Selected Contacts</p>
+                <div className="grid grid-cols-3 gap-2.5">
+                  {[
+                    { name: 'Steve', subtitle: 'Luma 21', img: '/landing/man-1.jpg' },
+                    { name: 'Lahai', subtitle: 'Binghatti', img: '/landing/woman-1.jpg' },
+                    { name: 'Jens', subtitle: 'JVC Tower', img: '/landing/man-2.jpg' }
+                  ].map((c, i) => (
+                    <div key={i} className="bg-white rounded-2xl p-2.5 flex flex-col items-center text-center shadow-lg border border-gray-100 transition-transform hover:-translate-y-0.5">
+                      <div className="w-10 h-10 rounded-full overflow-hidden mb-1.5 ring-2 ring-emerald-500/20 shadow-inner">
+                        <img src={c.img} alt={c.name} className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-xs font-bold text-gray-900 truncate w-full">{c.name}</p>
+                      <p className="text-[10px] text-gray-500 font-medium truncate w-full">{c.subtitle}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* Login Modal */}
+        {showLoginModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+            <div className="max-w-md w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-2xl p-8 shadow-2xl relative space-y-6 text-[#e1e1e1]">
+
+              {/* Modal Close Button */}
+              <button
+                onClick={() => setShowLoginModal(false)}
+                className="absolute top-4 right-4 text-[#888888] hover:text-white p-1 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="text-center space-y-2 pt-2">
+                <div className="w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mx-auto text-blue-400 shadow-inner">
+                  <Building2 className="w-8 h-8" />
+                </div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Broker Assistant</h2>
+                <p className="text-sm text-[#999999]">
+                  Sign in to access your property portfolio and WhatsApp messaging.
+                </p>
+              </div>
+
+              <div className="p-4 bg-[#252525] rounded-xl border border-[#333333] space-y-2 text-xs text-[#aaaaaa]">
+                <div className="flex items-center gap-2 text-white font-medium">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>Private & Secure Workspace</span>
+                </div>
+                <p>
+                  Your property listings, owner contacts, and WhatsApp messages are strictly private to your broker account.
+                </p>
+              </div>
+
+              <button
+                onClick={handleGoogleSignIn}
+                className="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-3 transition shadow-md cursor-pointer"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                  />
+                </svg>
+                <span>Sign in with Google</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Minimalist Footer like Google Labs (KEPT EXACTLY AS BEFORE) */}
+        <footer className="w-full max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-[#777777] border-t border-gray-200/80 relative z-20">
           <div>
             <span>Developed by </span>
             <a
               href="https://sixtenet.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#999999] hover:text-white hover:underline transition font-medium"
+              className="text-[#555555] hover:text-gray-900 hover:underline transition font-medium"
             >
               Six Tenet LLC
             </a>
@@ -420,23 +573,23 @@ export default function Home() {
               href="https://sixtenet.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition"
+              className="hover:text-gray-900 transition"
             >
               About
             </a>
             <span>·</span>
-            <Link href="/privacy" className="hover:text-white transition">Privacy</Link>
+            <Link href="/privacy" className="hover:text-gray-900 transition">Privacy</Link>
             <span>·</span>
-            <Link href="/terms" className="hover:text-white transition">Terms</Link>
+            <Link href="/terms" className="hover:text-gray-900 transition">Terms</Link>
             <span>·</span>
-            <a href="mailto:legal@sixtenet.com" className="hover:text-white transition">Help</a>
+            <a href="mailto:legal@sixtenet.com" className="hover:text-gray-900 transition">Help</a>
           </div>
         </footer>
       </main>
     );
   }
 
-  // --- Render Authenticated Dashboard ---
+  // --- Render Authenticated Dashboard (Dark Premium Aesthetic) ---
   return (
     <main className="min-h-screen bg-[#181818] text-[#e1e1e1] p-4 md:p-8 font-sans text-base flex flex-col justify-between">
       <div className="max-w-7xl mx-auto w-full space-y-6 flex-1">
