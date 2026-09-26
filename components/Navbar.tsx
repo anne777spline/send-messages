@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Building2, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface NavbarProps {
   onLoginClick?: () => void;
@@ -30,9 +30,7 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
   return (
     <header className="w-full max-w-7xl mx-auto px-6 py-4 md:py-5 flex items-center justify-between relative z-30 flex-shrink-0">
       <Link href="/" className="flex items-center gap-3 group">
-        <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center shadow-md group-hover:bg-black transition">
-          <Building2 className="w-5 h-5 text-blue-400" />
-        </div>
+        <img src="/logo.png" alt="Broker Assistant Logo" className="h-9 w-auto object-contain group-hover:scale-105 transition" />
         <span className="text-xl font-bold tracking-tight text-gray-900 group-hover:text-black transition">
           Broker Assistant
         </span>

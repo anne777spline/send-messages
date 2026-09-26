@@ -18,24 +18,30 @@ export default function ServicesPage() {
       <Navbar />
 
       {/* Page Content Container */}
-      <div className="w-full max-w-7xl mx-auto px-6 py-12 md:py-20 relative z-10 flex-1 space-y-16">
+      <div className="w-full max-w-7xl mx-auto px-6 pt-10 md:pt-16 pb-6 relative z-10 flex-1 my-auto space-y-10 md:space-y-12">
 
-        {/* Page Hero Header */}
-        <div className="max-w-3xl space-y-6">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-950 tracking-tight leading-[1.15]">
-            Enterprise Support &amp; Data Security
-          </h1>
-          <p className="text-lg text-gray-600 leading-relaxed font-normal">
-            Backed by Six Tenet LLC engineering, ensuring high availability, strict Row-Level Security isolation, and seamless portfolio migration.
-          </p>
+        {/* Page Hero Header: Title on Left, Subtitle on Right */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end">
+          <div className="lg:col-span-7">
+            <h1 className="font-pagani text-4xl sm:text-5xl lg:text-6xl font-light text-gray-950 leading-[1.1] tracking-tight">
+              Enterprise Support &amp; <br />
+              <span className="font-serif-accent italic font-normal text-black text-[1.08em]">Data Security</span> <br />
+              <span className="font-normal text-gray-900">for Brokers</span>
+            </h1>
+          </div>
+          <div className="lg:col-span-5 pb-1">
+            <p className="text-base sm:text-lg text-gray-600 leading-relaxed font-normal border-l-2 border-gray-950/20 pl-5">
+              Backed by Six Tenet LLC engineering, ensuring high availability, strict Row-Level Security isolation, and seamless portfolio migration.
+            </p>
+          </div>
         </div>
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
           <div className="bg-white/90 backdrop-blur-md border border-gray-200/90 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-4">
-            <div className="w-14 h-14 bg-amber-50 text-amber-700 rounded-2xl flex items-center justify-center font-bold border border-amber-100">
-              <ShieldCheck className="w-7 h-7" />
+            <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-md">
+              <ShieldCheck className="w-6 h-6 text-blue-400" />
             </div>
             <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Brokerage Data Privacy</h2>
             <p className="text-sm text-gray-600 leading-relaxed">
@@ -44,8 +50,8 @@ export default function ServicesPage() {
           </div>
 
           <div className="bg-white/90 backdrop-blur-md border border-gray-200/90 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-4">
-            <div className="w-14 h-14 bg-blue-50 text-blue-700 rounded-2xl flex items-center justify-center font-bold border border-blue-100">
-              <Upload className="w-7 h-7" />
+            <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-md">
+              <Upload className="w-6 h-6 text-blue-400" />
             </div>
             <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Portfolio Migration Service</h2>
             <p className="text-sm text-gray-600 leading-relaxed">
@@ -54,8 +60,8 @@ export default function ServicesPage() {
           </div>
 
           <div className="bg-white/90 backdrop-blur-md border border-gray-200/90 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-4">
-            <div className="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center font-bold border border-emerald-100">
-              <Smartphone className="w-7 h-7" />
+            <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-md">
+              <Smartphone className="w-6 h-6 text-blue-400" />
             </div>
             <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Dedicated Instance Routing</h2>
             <p className="text-sm text-gray-600 leading-relaxed">

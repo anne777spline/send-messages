@@ -18,16 +18,22 @@ export default function FeaturesPage() {
       <Navbar />
 
       {/* Page Content Container */}
-      <div className="w-full max-w-7xl mx-auto px-6 py-12 md:py-20 relative z-10 flex-1 space-y-20">
+      <div className="w-full max-w-7xl mx-auto px-6 pt-10 md:pt-16 pb-6 relative z-10 flex-1 my-auto space-y-10 md:space-y-12">
 
-        {/* Page Hero Header */}
-        <div className="max-w-3xl space-y-6">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-950 tracking-tight leading-[1.15]">
-            Engineered For Daily Broker Execution
-          </h1>
-          <p className="text-lg text-gray-600 leading-relaxed font-normal">
-            Everything real estate brokers need to locate property owners, parse portfolio spreadsheets, and initiate direct conversations without third-party fees.
-          </p>
+        {/* Page Hero Header: Title on Left, Subtitle on Right */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end">
+          <div className="lg:col-span-7">
+            <h1 className="font-pagani text-4xl sm:text-5xl lg:text-6xl font-light text-gray-950 leading-[1.1] tracking-tight">
+              Engineered For <br />
+              <span className="font-serif-accent italic font-normal text-black text-[1.08em]">Daily Execution</span> <br />
+              <span className="font-normal text-gray-900">for Brokers</span>
+            </h1>
+          </div>
+          <div className="lg:col-span-5 pb-1">
+            <p className="text-base sm:text-lg text-gray-600 leading-relaxed font-normal border-l-2 border-gray-950/20 pl-5">
+              Everything real estate brokers need to locate property owners, parse portfolio spreadsheets, and initiate direct conversations without third-party fees.
+            </p>
+          </div>
         </div>
 
         {/* 2x2 Feature Grid */}
