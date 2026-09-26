@@ -682,7 +682,7 @@ export default function Home() {
                   </>
                 ) : (
                   <>
-                    <Smartphone className="w-4 h-4 text-emerald-400" />
+                    <Smartphone className="w-4 h-4 text-white" />
                     <span>Link WhatsApp Account</span>
                   </>
                 )}
@@ -719,7 +719,7 @@ export default function Home() {
                   </>
                 ) : (
                   <>
-                    <FileText className="w-4 h-4 text-blue-400" />
+                    <FileText className="w-4 h-4 text-white" />
                     <span>Upload CSV File</span>
                   </>
                 )}
