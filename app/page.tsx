@@ -554,7 +554,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto w-full space-y-6 flex-1">
 
         {/* Top Header with User Info & Sign Out */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-[#2e2e2e] gap-4">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 gap-4">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="Broker Assistant Logo" className="h-10 w-auto object-contain" />
             <div>
@@ -571,7 +571,7 @@ export default function Home() {
             <div className="flex flex-col text-right">
               <span className="text-white font-medium truncate max-w-[220px]">{session.user.email}</span>
               <span className="text-[#888888] text-[11px] flex items-center justify-end gap-1.5 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" /> Broker Account
+                Broker Account
               </span>
             </div>
             <button
@@ -593,7 +593,6 @@ export default function Home() {
             <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Smartphone className="w-5 h-5 text-emerald-400" />
                   <span>WhatsApp Connection</span>
                 </h2>
                 {waStatus === 'connected' ? (
@@ -694,7 +693,6 @@ export default function Home() {
             <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Upload className="w-5 h-5 text-blue-400" />
                   <span>Import Property Listings</span>
                 </h2>
                 <span className="text-xs bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded">CSV Spreadsheet</span>
