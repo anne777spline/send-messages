@@ -605,15 +605,15 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-white tracking-tight">WhatsApp Connection</h2>
                   {waStatus === 'connected' ? (
-                    <span className="text-[11px] bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Connected
+                    <span className="text-[11px] bg-[#89c900] text-black px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5 shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" /> Connected
                     </span>
                   ) : waStatus === 'connecting' ? (
-                    <span className="text-[11px] bg-amber-950/80 text-amber-300 border border-amber-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                    <span className="text-[11px] bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1.5">
                       <RefreshCw className="w-3 h-3 animate-spin text-amber-400" /> Scanning...
                     </span>
                   ) : (
-                    <span className="text-[11px] bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded-full font-medium">
+                    <span className="text-[11px] bg-[#2b2b2b] text-[#888888] border border-[#383838] px-2.5 py-0.5 rounded-full font-medium">
                       Not Connected
                     </span>
                   )}

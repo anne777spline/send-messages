@@ -92,36 +92,70 @@ export async function POST(request: Request) {
 
   // 5. Enviar a n8n con autenticación server-to-server
   const webhookSecret = process.env.N8N_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    console.error('[dispatch] N8N_WEBHOOK_SECRET is not set');
+  const webhookUrl = process.env.N8N_WEBHOOK_URL;
+  if (!webhookSecret || !webhookUrl) {
+    console.error('[dispatch] N8N_WEBHOOK_SECRET or N8N_WEBHOOK_URL is not set');
     return NextResponse.json({ error: 'Webhook configuration error' }, { status: 500 });
   }
 
-  const n8nResponse = await fetch(process.env.N8N_WEBHOOK_URL!, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Webhook-Secret': webhookSecret,
-    },
-    body: JSON.stringify({
-      instance_name: instance.instance_name,
-      campaign_name: building || 'Selected Leads Campaign',
-      total_leads: leads.length,
-      leads,
-    }),
-  });
+  const payload = {
+    instance_name: instance.instance_name,
+    campaign_name: building || 'Selected Leads Campaign',
+    total_leads: leads.length,
+    leads,
+  };
 
-  if (!n8nResponse.ok) {
-    console.error('[dispatch] n8n webhook responded with', n8nResponse.status);
+  try {
+    const n8nResponse = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Webhook-Secret': webhookSecret,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseText = await n8nResponse.text();
+    let responseData: any;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch {
+      responseData = responseText;
+    }
+
+    if (!n8nResponse.ok) {
+      return NextResponse.json(
+        {
+          error: 'n8n webhook error',
+          _debug: {
+            status: n8nResponse.status,
+            n8nResponse: responseData,
+            payloadSent: payload,
+          },
+        },
+        { status: 502 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      total_sent: leads.length,
+      sample_message: leads[0]?.message,
+      _debug: {
+        n8nResponse: responseData,
+        payloadSent: payload,
+      },
+    });
+  } catch (err: any) {
     return NextResponse.json(
-      { error: 'Failed to dispatch campaign. Please try again.' },
-      { status: 502 }
+      {
+        error: 'Network error calling n8n webhook',
+        _debug: {
+          message: err.message,
+          payloadSent: payload,
+        },
+      },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({
-    success: true,
-    total_sent: leads.length,
-    sample_message: leads[0]?.message,
-  });
 }
