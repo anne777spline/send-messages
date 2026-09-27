@@ -884,7 +884,7 @@ export default function Home() {
                     </span>
                   </h2>
                   {results.length > 0 && (
-                    <span className="text-xs bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 px-2 py-0.5 rounded font-mono">
+                    <span className="text-xs bg-white text-gray-950 px-2 py-0.5 rounded font-mono font-bold shadow-sm">
                       {selectedIds.size} of {results.length} selected
                     </span>
                   )}
