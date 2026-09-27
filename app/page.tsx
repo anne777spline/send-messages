@@ -551,24 +551,24 @@ export default function Home() {
 
   // --- Render Authenticated Dashboard (Dark Premium Aesthetic) ---
   return (
-    <main className="min-h-screen bg-[#181818] text-[#e1e1e1] p-4 md:p-8 font-sans text-base flex flex-col justify-between">
-      <div className="max-w-7xl mx-auto w-full space-y-6 flex-1">
+    <main className="min-h-screen bg-[#181818] text-[#e1e1e1] p-3 md:p-6 font-sans text-base flex flex-col justify-between">
+      <div className="max-w-7xl mx-auto w-full space-y-4 flex-1">
 
         {/* Top Header with User Info & Sign Out */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 gap-4">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-3.5 gap-3">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Broker Assistant Logo" className="h-10 w-auto object-contain" />
+            <img src="/logo.png" alt="Broker Assistant Logo" className="h-9 w-auto object-contain" />
             <div>
-              <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
+              <h1 className="text-xl md:text-2xl font-semibold text-white tracking-tight">
                 Broker Assistant
               </h1>
-              <p className="text-[#999999] text-xs md:text-sm">
+              <p className="text-[#999999] text-xs">
                 Search property owners, filter buildings, and deliver direct WhatsApp messages.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 bg-[#222222] border border-[#333333] px-3.5 py-2 rounded-xl text-xs">
+          <div className="flex items-center gap-3 bg-[#222222] border border-[#333333] px-3 py-1.5 rounded-xl text-xs">
             <div className="flex flex-col text-right">
               <span className="text-white font-medium truncate max-w-[220px]">{session.user.email}</span>
               <span className="text-[#888888] text-[11px] flex items-center justify-end gap-1.5 mt-0.5">
@@ -585,10 +585,10 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
           {/* Left Column: WhatsApp Status, Import Listings & Message Template */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-4">
 
             {/* Combined Single Card: WhatsApp & Import */}
             <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-5">
