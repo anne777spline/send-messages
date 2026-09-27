@@ -106,8 +106,15 @@ export default function Home() {
       const res = await fetch('/api/whatsapp/status');
       if (res.ok) {
         const data = await res.json();
-        setWaStatus(data.status);
         if (data.instanceName) setWaInstanceName(data.instanceName);
+
+        // Si hay un QR activo mostrándose, solo actualizar si ya se conectó
+        // (evita que el polling borre el QR antes de que el usuario lo escanee)
+        setWaStatus(prev => {
+          if (prev === 'connecting' && data.status !== 'connected') return prev;
+          return data.status;
+        });
+
         if (data.status === 'connected') {
           setWaQrCode(null);
           setWaQrExpiresAt(null);
