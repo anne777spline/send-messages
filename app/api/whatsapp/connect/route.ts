@@ -24,10 +24,16 @@ export async function POST() {
   const admin = createServerSupabase();
   const instanceName = tenant.tenantSlug;
 
+  console.log(`[whatsapp/connect] tenantId=${tenant.tenantId} tenantSlug="${tenant.tenantSlug}" instanceName="${instanceName}"`);
+  console.log(`[whatsapp/connect] EVOLUTION_API_URL=${process.env.EVOLUTION_API_URL}`);
+
   try {
     // 2. Consultar estado real en Evolution API
+    console.log(`[whatsapp/connect] Calling getInstanceStatus for "${instanceName}"...`);
     const evolutionStatus = await getInstanceStatus(instanceName);
+    console.log(`[whatsapp/connect] getInstanceStatus response:`, JSON.stringify(evolutionStatus));
     const evolutionState = (evolutionStatus as any)?.instance?.state;
+    console.log(`[whatsapp/connect] evolutionState="${evolutionState}"`);
 
     // 3a. Ya conectado en Evolution -> sincronizar DB y devolver
     if (evolutionState === 'open') {
@@ -115,7 +121,7 @@ export async function POST() {
     return NextResponse.json({ status: 'connecting', qrCode: qr, expiresAt });
   } catch (e) {
     if (e instanceof EvolutionApiError) {
-      console.error(`[whatsapp/connect] Evolution API error ${e.statusCode}:`, e.message);
+      console.error(`[whatsapp/connect] EvolutionApiError statusCode=${e.statusCode} message="${e.message}" body=`, JSON.stringify(e.body));
       return NextResponse.json(
         { error: 'WhatsApp service unavailable. Please try again.' },
         { status: 502 }
