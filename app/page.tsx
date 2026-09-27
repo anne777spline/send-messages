@@ -660,7 +660,7 @@ export default function Home() {
                     </>
                   ) : waStatus === 'connected' ? (
                     <>
-                      <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
+                      <RefreshCw className="w-3.5 h-3.5 text-white" />
                       <span>WhatsApp Linked (Refresh)</span>
                     </>
                   ) : waStatus === 'connecting' ? (
