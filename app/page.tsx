@@ -591,51 +591,51 @@ export default function Home() {
           <div className="lg:col-span-1 space-y-4">
 
             {/* Combined Single Card: WhatsApp & Import */}
-            <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-5">
+            <div className="bg-[#222222] border border-[#333333] rounded-xl p-3.5 space-y-3">
               
               {/* WhatsApp Section */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold text-white">WhatsApp Connection</h2>
+                  <h2 className="text-xs font-semibold text-white">WhatsApp Connection</h2>
                   {waStatus === 'connected' ? (
-                    <span className="text-[11px] bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1.5">
+                    <span className="text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Connected
                     </span>
                   ) : waStatus === 'connecting' ? (
-                    <span className="text-[11px] bg-amber-950/80 text-amber-300 border border-amber-700/60 px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1.5">
+                    <span className="text-[10px] bg-amber-950/80 text-amber-300 border border-amber-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
                       <RefreshCw className="w-3 h-3 animate-spin text-amber-400" /> Scanning...
                     </span>
                   ) : (
-                    <span className="text-[11px] bg-[#2b2b2b] text-[#888888] px-2.5 py-0.5 rounded-full font-medium">
+                    <span className="text-[10px] bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded-full font-medium">
                       Not Connected
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs text-[#888888] leading-relaxed">
+                <p className="text-[11px] text-[#888888] leading-tight">
                   Link your phone to send messages directly to property owners from your WhatsApp account.
                 </p>
 
                 {/* QR Code Display when Connecting */}
                 {waStatus === 'connecting' && waQrCode && (
-                  <div className="bg-[#181818] border border-[#3a3a3a] rounded-xl p-3 flex flex-col items-center space-y-2 text-center">
-                    <div className="bg-white p-2.5 rounded-lg shadow-inner">
+                  <div className="bg-[#181818] border border-[#3a3a3a] rounded-xl p-2.5 flex flex-col items-center space-y-1.5 text-center">
+                    <div className="bg-white p-2 rounded-lg shadow-inner">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={waQrCode.startsWith('data:') ? waQrCode : `data:image/png;base64,${waQrCode}`}
                         alt="WhatsApp QR Code"
-                        className="w-44 h-44 object-contain"
+                        className="w-36 h-36 object-contain"
                       />
                     </div>
-                    <p className="text-[11px] text-[#888888]">
-                      WhatsApp → Settings → Linked Devices → Link a Device
+                    <p className="text-[10px] text-[#888888]">
+                      Scan with WhatsApp → Linked Devices
                     </p>
                   </div>
                 )}
 
                 {waError && (
-                  <div className="p-2.5 bg-red-950/40 border border-red-800/60 rounded-lg text-xs text-red-300 flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400 mt-0.5" />
+                  <div className="p-2 bg-red-950/40 border border-red-800/60 rounded-lg text-[11px] text-red-300 flex items-start gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-red-400 mt-0.5" />
                     <span>{waError}</span>
                   </div>
                 )}
@@ -644,26 +644,26 @@ export default function Home() {
                   type="button"
                   onClick={handleConnectWhatsApp}
                   disabled={waLoading}
-                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition cursor-pointer"
+                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-1.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                 >
                   {waLoading ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
-                      <span>Connecting to WhatsApp...</span>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                      <span>Connecting...</span>
                     </>
                   ) : waStatus === 'connected' ? (
                     <>
-                      <RefreshCw className="w-4 h-4 text-emerald-400" />
-                      <span>WhatsApp Linked (Click to Refresh)</span>
+                      <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>WhatsApp Linked (Refresh)</span>
                     </>
                   ) : waStatus === 'connecting' ? (
                     <>
-                      <RefreshCw className="w-4 h-4 text-blue-400" />
+                      <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
                       <span>Refresh QR Code</span>
                     </>
                   ) : (
                     <>
-                      <Smartphone className="w-4 h-4 text-white" />
+                      <Smartphone className="w-3.5 h-3.5 text-white" />
                       <span>Link WhatsApp Account</span>
                     </>
                   )}
@@ -673,12 +673,12 @@ export default function Home() {
               <div className="border-t border-[#333333]" />
 
               {/* Import CSV Section */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold text-white">Import Property Listings</h2>
-                  <span className="text-[11px] bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded">CSV Spreadsheet</span>
+                  <h2 className="text-xs font-semibold text-white">Import Property Listings</h2>
+                  <span className="text-[10px] bg-[#2b2b2b] text-[#888888] px-1.5 py-0.5 rounded">CSV</span>
                 </div>
-                <p className="text-xs text-[#888888] leading-relaxed">
+                <p className="text-[11px] text-[#888888] leading-tight">
                   Upload your CSV spreadsheet to add or update your property and owner listings.
                 </p>
                 <input
@@ -691,16 +691,16 @@ export default function Home() {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
+                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-1.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer"
                 >
                   {uploading ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
-                      <span>Processing &amp; Importing...</span>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                      <span>Importing...</span>
                     </>
                   ) : (
                     <>
-                      <FileText className="w-4 h-4 text-white" />
+                      <FileText className="w-3.5 h-3.5 text-white" />
                       <span>Upload CSV File</span>
                     </>
                   )}
@@ -708,27 +708,27 @@ export default function Home() {
 
                 {importResult && (
                   <div
-                    className={`p-2.5 rounded-lg text-xs flex items-start gap-2 ${importResult.success
+                    className={`p-2 rounded-lg text-[11px] flex items-start gap-1.5 ${importResult.success
                       ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
                       : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
                       }`}
                   >
                     {importResult.success ? (
                       <>
-                        <CheckCircle className="w-4 h-4 flex-shrink-0 text-emerald-400 mt-0.5" />
+                        <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 text-emerald-400 mt-0.5" />
                         <div>
                           <p className="font-medium text-emerald-300">Properties Imported!</p>
-                          <p className="text-[11px] text-[#a3e635] mt-0.5">
-                            {importResult.total_processed} record(s) processed and added to your portfolio.
+                          <p className="text-[10px] text-[#a3e635]">
+                            {importResult.total_processed} record(s) added to portfolio.
                           </p>
                         </div>
                       </>
                     ) : (
                       <>
-                        <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400 mt-0.5" />
+                        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-red-400 mt-0.5" />
                         <div>
                           <p className="font-medium text-red-300">Import Failed</p>
-                          <p className="text-[11px] text-red-200 mt-0.5">{importResult.error}</p>
+                          <p className="text-[10px] text-red-200">{importResult.error}</p>
                         </div>
                       </>
                     )}
@@ -739,13 +739,13 @@ export default function Home() {
             </div>
 
             {/* Template Editor Card */}
-            <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
-              <h2 className="text-lg font-semibold text-white">Message Template</h2>
-              <p className="text-xs text-[#888888]">
-                Click tags to insert owner or property details automatically:
+            <div className="bg-[#222222] border border-[#333333] rounded-xl p-3.5 space-y-2.5">
+              <h2 className="text-xs font-semibold text-white">Message Template</h2>
+              <p className="text-[11px] text-[#888888]">
+                Click tags to insert details automatically:
               </p>
               {/* Message Template Tags */}
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1">
                 {[
                   { tag: 'owner_name', label: '+ Owner Name' },
                   { tag: 'building_name', label: '+ Building' },
@@ -756,17 +756,17 @@ export default function Home() {
                     key={item.tag}
                     type="button"
                     onClick={() => insertTag(item.tag)}
-                    className="bg-[#89c900]/10 hover:bg-[#89c900]/20 text-[#d8e454] text-xs px-2.5 py-1.5 rounded border border-[#89c900]/30 transition cursor-pointer font-medium"
+                    className="bg-[#89c900]/10 hover:bg-[#89c900]/20 text-[#d8e454] text-[11px] px-2 py-1 rounded border border-[#89c900]/30 transition cursor-pointer font-medium"
                   >
                     {item.label}
                   </button>
                 ))}
               </div>
               <textarea
-                rows={4}
+                rows={3}
                 value={template}
                 onChange={e => setTemplate(e.target.value)}
-                className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#89c900] leading-relaxed"
+                className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#89c900] leading-relaxed"
               />
 
               {/* Send Button */}
