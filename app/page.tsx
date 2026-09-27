@@ -590,166 +590,104 @@ export default function Home() {
           {/* Left Column: WhatsApp Status, Import Listings & Message Template */}
           <div className="lg:col-span-1 space-y-6">
 
-            {/* WhatsApp Connection Card */}
-            <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <span>WhatsApp Connection</span>
-                </h2>
+            {/* Unified Account & Portfolio Actions Card */}
+            <div className="bg-[#222222] border border-[#333333] rounded-xl p-4 space-y-3.5">
+              <div className="flex items-center justify-between border-b border-[#2d2d2d] pb-2.5">
+                <h2 className="text-sm font-semibold text-white">System Status &amp; Import</h2>
                 {waStatus === 'connected' ? (
-                  <span className="text-xs bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2.5 py-1 rounded-full font-medium flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Connected
-                  </span>
-                ) : waStatus === 'connecting' ? (
-                  <span className="text-xs bg-amber-950/80 text-amber-300 border border-amber-700/60 px-2.5 py-1 rounded-full font-medium flex items-center gap-1.5">
-                    <RefreshCw className="w-3 h-3 animate-spin text-amber-400" /> Waiting for scan...
+                  <span className="text-[11px] bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Linked
                   </span>
                 ) : (
-                  <span className="text-xs bg-[#2b2b2b] text-[#888888] px-2.5 py-1 rounded-full font-medium">
+                  <span className="text-[11px] bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded-full font-medium">
                     Not Connected
                   </span>
                 )}
               </div>
 
-              {waStatus === 'connected' ? (
-                <div className="bg-[#1b2a1e] border border-[#2e5235] rounded-lg p-3 text-xs text-[#a3e635] space-y-1">
-                  <p className="font-semibold text-emerald-300 flex items-center gap-1.5">
-                    <CheckCircle className="w-4 h-4 text-emerald-400" /> WhatsApp connected & ready
-                  </p>
-                  <p className="text-[#888888]">
-                    Messages will be sent directly from your linked phone number.
-                  </p>
-                </div>
-              ) : (
-                <p className="text-xs text-[#888888]">
-                  Link your phone to send messages directly to property owners from your WhatsApp account.
-                </p>
-              )}
+              {/* Action Buttons Side-by-Side */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={handleConnectWhatsApp}
+                  disabled={waLoading}
+                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2 px-2.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer truncate"
+                >
+                  {waLoading ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                  ) : waStatus === 'connected' ? (
+                    <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
+                  ) : (
+                    <Smartphone className="w-3.5 h-3.5 text-white" />
+                  )}
+                  <span className="truncate">
+                    {waStatus === 'connected' ? 'Refresh Line' : 'Link WhatsApp'}
+                  </span>
+                </button>
+
+                <input
+                  type="file"
+                  accept=".csv"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2 px-2.5 rounded-lg text-xs flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer truncate"
+                >
+                  {uploading ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                  ) : (
+                    <FileText className="w-3.5 h-3.5 text-white" />
+                  )}
+                  <span className="truncate">
+                    {uploading ? 'Importing...' : 'Upload CSV'}
+                  </span>
+                </button>
+              </div>
 
               {/* QR Code Display when Connecting */}
               {waStatus === 'connecting' && waQrCode && (
-                <div className="bg-[#181818] border border-[#3a3a3a] rounded-xl p-4 flex flex-col items-center space-y-3 text-center">
-                  <div className="bg-white p-3 rounded-lg shadow-inner">
+                <div className="bg-[#181818] border border-[#3a3a3a] rounded-xl p-3 flex flex-col items-center space-y-2 text-center">
+                  <div className="bg-white p-2 rounded-lg shadow-inner">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={waQrCode.startsWith('data:') ? waQrCode : `data:image/png;base64,${waQrCode}`}
                       alt="WhatsApp QR Code"
-                      className="w-48 h-48 object-contain"
+                      className="w-40 h-40 object-contain"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-white font-medium flex items-center justify-center gap-1.5">
-                      <QrCodeIcon className="w-4 h-4 text-blue-400" /> Scan QR with WhatsApp
-                    </p>
-                    <p className="text-[11px] text-[#888888]">
-                      WhatsApp → Settings → Linked Devices → Link a Device
-                    </p>
-                    {waQrCountdown > 0 && (
-                      <p className="text-[11px] text-amber-400 font-mono">
-                        Expires in {waQrCountdown}s
-                      </p>
-                    )}
-                  </div>
+                  <p className="text-[11px] text-[#888888]">
+                    Scan with WhatsApp → Linked Devices
+                  </p>
                 </div>
               )}
 
               {waError && (
-                <div className="p-3 bg-red-950/40 border border-red-800/60 rounded-lg text-xs text-red-300 flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400 mt-0.5" />
+                <div className="p-2 bg-red-950/40 border border-red-800/60 rounded-lg text-[11px] text-red-300 flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-red-400" />
                   <span>{waError}</span>
                 </div>
               )}
 
-              <button
-                type="button"
-                onClick={handleConnectWhatsApp}
-                disabled={waLoading}
-                className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition cursor-pointer"
-              >
-                {waLoading ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
-                    <span>Connecting to WhatsApp...</span>
-                  </>
-                ) : waStatus === 'connected' ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 text-emerald-400" />
-                    <span>WhatsApp Linked (Click to Refresh)</span>
-                  </>
-                ) : waStatus === 'connecting' ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 text-blue-400" />
-                    <span>Refresh QR Code</span>
-                  </>
-                ) : (
-                  <>
-                    <Smartphone className="w-4 h-4 text-white" />
-                    <span>Link WhatsApp Account</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* CSV Import Card */}
-            <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <span>Import Property Listings</span>
-                </h2>
-                <span className="text-xs bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded">CSV Spreadsheet</span>
-              </div>
-              <p className="text-xs text-[#888888]">
-                Upload your CSV spreadsheet to add or update your property and owner listings.
-              </p>
-              <input
-                type="file"
-                accept=".csv"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2.5 transition shadow-sm cursor-pointer"
-              >
-                {uploading ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
-                    <span>Processing & Importing...</span>
-                  </>
-                ) : (
-                  <>
-                    <FileText className="w-4 h-4 text-white" />
-                    <span>Upload CSV File</span>
-                  </>
-                )}
-              </button>
-
               {importResult && (
                 <div
-                  className={`p-3 rounded-lg text-sm flex items-start gap-2.5 ${importResult.success
+                  className={`p-2 rounded-lg text-xs flex items-center gap-2 ${importResult.success
                     ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
                     : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
                     }`}
                 >
                   {importResult.success ? (
                     <>
-                      <CheckCircle className="w-5 h-5 flex-shrink-0 text-emerald-400 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-emerald-300">Properties Imported!</p>
-                        <p className="text-xs text-[#a3e635] mt-0.5">
-                          {importResult.total_processed} record(s) processed and added to your portfolio.
-                        </p>
-                      </div>
+                      <CheckCircle className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+                      <span className="truncate">{importResult.total_processed} records imported to portfolio.</span>
                     </>
                   ) : (
                     <>
-                      <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-red-300">Import Failed</p>
-                        <p className="text-xs text-red-200 mt-0.5">{importResult.error}</p>
-                      </div>
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
+                      <span className="truncate">{importResult.error}</span>
                     </>
                   )}
                 </div>
