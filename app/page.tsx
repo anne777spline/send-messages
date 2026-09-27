@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {
   Search,
   Building2,
+  UserCheck,
   Send,
   RefreshCw,
   CheckCircle,
@@ -428,7 +429,7 @@ export default function Home() {
               {/* Card Top Badge */}
               <div className="flex items-center justify-between border-b border-gray-800 pb-4">
                 <div className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shadow-md">
-                  <Building2 className="w-5 h-5 text-white" />
+                  <UserCheck className="w-5 h-5 text-white" />
                 </div>
                 <span className="bg-emerald-950 text-emerald-400 border border-emerald-800/80 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5">
                   <CheckCheck className="w-3.5 h-3.5" /> Ready
@@ -761,6 +762,7 @@ export default function Home() {
               <p className="text-xs text-[#888888]">
                 Click tags to insert owner or property details automatically:
               </p>
+              {/* Message Template Tags */}
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { tag: 'owner_name', label: '+ Owner Name' },
@@ -772,7 +774,7 @@ export default function Home() {
                     key={item.tag}
                     type="button"
                     onClick={() => insertTag(item.tag)}
-                    className="bg-[#2b2b2b] hover:bg-[#383838] text-blue-400 text-xs px-2.5 py-1.5 rounded border border-[#3d3d3d] transition cursor-pointer"
+                    className="bg-[#89c900]/10 hover:bg-[#89c900]/20 text-[#d8e454] text-xs px-2.5 py-1.5 rounded border border-[#89c900]/30 transition cursor-pointer font-medium"
                   >
                     {item.label}
                   </button>
@@ -782,7 +784,7 @@ export default function Home() {
                 rows={4}
                 value={template}
                 onChange={e => setTemplate(e.target.value)}
-                className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 leading-relaxed"
+                className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#89c900] leading-relaxed"
               />
 
               {/* Send Button */}
@@ -790,9 +792,9 @@ export default function Home() {
                 type="button"
                 onClick={handleDispatch}
                 disabled={sending || selectedIds.size === 0}
-                className="w-full bg-emerald-600 text-white font-medium py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-emerald-500 enabled:active:bg-emerald-700 enabled:cursor-pointer"
+                className="w-full bg-[#89c900] text-gray-950 font-bold py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-md disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-[#7bb700] enabled:active:bg-[#6fa500] enabled:cursor-pointer"
               >
-                {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                {sending ? <RefreshCw className="w-4 h-4 animate-spin text-gray-950" /> : <Send className="w-4 h-4 text-gray-950" />}
                 <span>
                   {sending
                     ? 'Sending Messages...'
@@ -871,9 +873,9 @@ export default function Home() {
                 type="submit"
                 disabled={loading}
                 title="Search Properties"
-                className="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-50 text-white p-2.5 rounded-lg flex items-center justify-center transition shadow-sm flex-shrink-0 w-full sm:w-11 h-10 cursor-pointer"
+                className="bg-[#89c900] hover:bg-[#7bb700] active:bg-[#6fa500] disabled:opacity-50 text-gray-950 font-bold p-2.5 rounded-lg flex items-center justify-center transition shadow-md flex-shrink-0 w-full sm:w-11 h-10 cursor-pointer"
               >
-                {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+                {loading ? <RefreshCw className="w-5 h-5 animate-spin text-gray-950" /> : <Search className="w-5 h-5 text-gray-950" />}
               </button>
 
               {/* Clear button if search is active */}
@@ -895,7 +897,7 @@ export default function Home() {
                 <div className="flex items-center gap-3">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                     <span>Properties Found</span>
-                    <span className="text-xs bg-[#2b2b2b] text-blue-400 px-2.5 py-0.5 rounded-full font-mono">
+                    <span className="text-xs bg-[#89c900]/15 text-[#d8e454] border border-[#89c900]/30 px-2.5 py-0.5 rounded-full font-mono font-medium">
                       {results.length.toLocaleString()}
                     </span>
                   </h2>
