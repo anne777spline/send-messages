@@ -551,8 +551,8 @@ export default function Home() {
 
   // --- Render Authenticated Dashboard (Dark Premium Aesthetic) ---
   return (
-    <main className="min-h-screen bg-[#181818] text-[#e1e1e1] p-3 md:p-5 font-sans text-base">
-      <div className="max-w-7xl mx-auto w-full space-y-4">
+    <main className="min-h-screen bg-[#181818] text-[#e1e1e1] p-4 md:p-6 font-sans text-base">
+      <div className="max-w-7xl mx-auto w-full space-y-5">
 
         {/* Top Header with User Info & Sign Out */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-1 gap-2">
@@ -585,34 +585,34 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
           {/* Left Column: WhatsApp Status, Import Listings & Message Template */}
-          <div className="lg:col-span-1 space-y-4">
+          <div className="lg:col-span-1 space-y-5">
 
             {/* Combined Single Card: WhatsApp & Import */}
-            <div className="bg-[#222222] border border-[#333333] rounded-xl p-4 space-y-3.5">
+            <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
               
               {/* WhatsApp Section */}
-              <div className="space-y-1.5">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-[15px] font-semibold text-white tracking-tight">WhatsApp Connection</h2>
                   {waStatus === 'connected' ? (
-                    <span className="text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                    <span className="text-[11px] bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Connected
                     </span>
                   ) : waStatus === 'connecting' ? (
-                    <span className="text-[10px] bg-amber-950/80 text-amber-300 border border-amber-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                    <span className="text-[11px] bg-amber-950/80 text-amber-300 border border-amber-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
                       <RefreshCw className="w-3 h-3 animate-spin text-amber-400" /> Scanning...
                     </span>
                   ) : (
-                    <span className="text-[10px] bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded-full font-medium">
+                    <span className="text-[11px] bg-[#2b2b2b] text-[#888888] px-2 py-0.5 rounded-full font-medium">
                       Not Connected
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs text-[#888888] leading-tight">
+                <p className="text-[13px] text-[#999999] leading-snug">
                   Link your phone to send messages directly to property owners from your WhatsApp account.
                 </p>
 
@@ -644,7 +644,7 @@ export default function Home() {
                   type="button"
                   onClick={handleConnectWhatsApp}
                   disabled={waLoading}
-                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-1.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition cursor-pointer"
                 >
                   {waLoading ? (
                     <>
@@ -673,12 +673,12 @@ export default function Home() {
               <div className="border-t border-[#333333]" />
 
               {/* Import CSV Section */}
-              <div className="space-y-1.5">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-[15px] font-semibold text-white tracking-tight">Import Property Listings</h2>
-                  <span className="text-[10px] bg-[#2b2b2b] text-[#888888] px-1.5 py-0.5 rounded font-mono">CSV</span>
+                  <span className="text-[11px] bg-[#2b2b2b] text-[#888888] px-1.5 py-0.5 rounded font-mono">CSV</span>
                 </div>
-                <p className="text-xs text-[#888888] leading-tight">
+                <p className="text-[13px] text-[#999999] leading-snug">
                   Upload your CSV spreadsheet to add or update your property and owner listings.
                 </p>
                 <input
@@ -691,7 +691,7 @@ export default function Home() {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-1.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer"
+                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer"
                 >
                   {uploading ? (
                     <>
@@ -739,9 +739,9 @@ export default function Home() {
             </div>
 
             {/* Template Editor Card */}
-            <div className="bg-[#222222] border border-[#333333] rounded-xl p-4 space-y-2">
+            <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-3">
               <h2 className="text-[15px] font-semibold text-white tracking-tight">Message Template</h2>
-              <p className="text-xs text-[#888888]">
+              <p className="text-[13px] text-[#999999]">
                 Click tags to insert details automatically:
               </p>
               {/* Message Template Tags */}
@@ -763,10 +763,10 @@ export default function Home() {
                 ))}
               </div>
               <textarea
-                rows={3}
+                rows={4}
                 value={template}
                 onChange={e => setTemplate(e.target.value)}
-                className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg p-2.5 text-[13px] text-white focus:outline-none focus:border-[#89c900] leading-relaxed resize-y"
+                className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg p-3 text-[13px] text-white focus:outline-none focus:border-[#89c900] leading-relaxed resize-y"
               />
 
               {/* Send Button */}
@@ -774,7 +774,7 @@ export default function Home() {
                 type="button"
                 onClick={handleDispatch}
                 disabled={sending || selectedIds.size === 0}
-                className="w-full bg-[#89c900] text-gray-950 font-bold py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-md disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-[#7bb700] enabled:active:bg-[#6fa500] enabled:cursor-pointer"
+                className="w-full bg-[#89c900] text-gray-950 font-bold py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-md disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-[#7bb700] enabled:active:bg-[#6fa500] enabled:cursor-pointer"
               >
                 {sending ? <RefreshCw className="w-4 h-4 animate-spin text-gray-950" /> : <Send className="w-4 h-4 text-gray-950" />}
                 <span>
