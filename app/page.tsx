@@ -596,7 +596,7 @@ export default function Home() {
               {/* WhatsApp Section */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-[15px] font-semibold text-white tracking-tight">WhatsApp Connection</h2>
+                  <h2 className="text-lg font-semibold text-white tracking-tight">WhatsApp Connection</h2>
                   {waStatus === 'connected' ? (
                     <span className="text-[11px] bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Connected
@@ -675,7 +675,7 @@ export default function Home() {
               {/* Import CSV Section */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-[15px] font-semibold text-white tracking-tight">Import Property Listings</h2>
+                  <h2 className="text-lg font-semibold text-white tracking-tight">Import Property Listings</h2>
                   <span className="text-[11px] bg-[#2b2b2b] text-[#888888] px-1.5 py-0.5 rounded font-mono">CSV</span>
                 </div>
                 <p className="text-[13px] text-[#999999] leading-snug">
@@ -740,7 +740,7 @@ export default function Home() {
 
             {/* Template Editor Card */}
             <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-3">
-              <h2 className="text-[15px] font-semibold text-white tracking-tight">Message Template</h2>
+              <h2 className="text-lg font-semibold text-white tracking-tight">Message Template</h2>
               <p className="text-[13px] text-[#999999]">
                 Click tags to insert details automatically:
               </p>
