@@ -84,7 +84,11 @@ export async function createInstance(instanceName: string): Promise<any> {
   const res = await evolutionFetch(`${EVOLUTION_URL}/instance/create`, {
     method: 'POST',
     headers: evolutionHeaders(),
-    body: JSON.stringify({ instanceName, qrcode: true }),
+    body: JSON.stringify({
+      instanceName,
+      qrcode: true,
+      integration: 'WHATSAPP-BAILEYS',
+    }),
   });
   return parseEvolutionResponse(res);
 }
