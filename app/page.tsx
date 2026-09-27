@@ -599,14 +599,14 @@ export default function Home() {
 
             {/* Combined Single Card: WhatsApp & Import */}
             <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
-              
+
               {/* WhatsApp Section */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-white tracking-tight">WhatsApp Connection</h2>
                   {waStatus === 'connected' ? (
                     <span className="text-[11px] bg-[#89c900] text-black px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5 shadow-sm">
-                      <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" /> Connected
+                      <span className="w-1.5 h-1.5 rounded-full bg-black" /> Connected
                     </span>
                   ) : waStatus === 'connecting' ? (
                     <span className="text-[11px] bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1.5">
