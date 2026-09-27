@@ -23,17 +23,20 @@ export async function POST() {
 
   const admin = createServerSupabase();
   const instanceName = tenant.tenantSlug;
+  const evolutionApiUrl = process.env.EVOLUTION_API_URL;
 
-  console.log(`[whatsapp/connect] tenantId=${tenant.tenantId} tenantSlug="${tenant.tenantSlug}" instanceName="${instanceName}"`);
-  console.log(`[whatsapp/connect] EVOLUTION_API_URL=${process.env.EVOLUTION_API_URL}`);
+  // DEBUG: visible en Network tab del browser
+  const debugInfo = {
+    tenantId: tenant.tenantId,
+    tenantSlug: tenant.tenantSlug,
+    instanceName,
+    evolutionApiUrl,
+  };
 
   try {
     // 2. Consultar estado real en Evolution API
-    console.log(`[whatsapp/connect] Calling getInstanceStatus for "${instanceName}"...`);
     const evolutionStatus = await getInstanceStatus(instanceName);
-    console.log(`[whatsapp/connect] getInstanceStatus response:`, JSON.stringify(evolutionStatus));
     const evolutionState = (evolutionStatus as any)?.instance?.state;
-    console.log(`[whatsapp/connect] evolutionState="${evolutionState}"`);
 
     // 3a. Ya conectado en Evolution -> sincronizar DB y devolver
     if (evolutionState === 'open') {
@@ -49,7 +52,7 @@ export async function POST() {
         },
         { onConflict: 'tenant_id' }
       );
-      return NextResponse.json({ status: 'connected', instanceName });
+      return NextResponse.json({ status: 'connected', instanceName, _debug: debugInfo });
     }
 
     // 3b. Instancia no existe -> crearla
@@ -71,7 +74,7 @@ export async function POST() {
         { onConflict: 'tenant_id' }
       );
 
-      return NextResponse.json({ status: 'connecting', qrCode: qr, expiresAt });
+      return NextResponse.json({ status: 'connecting', qrCode: qr, expiresAt, _debug: debugInfo });
     }
 
     // 3c. Instancia en estado error -> intentar recrear
@@ -98,7 +101,7 @@ export async function POST() {
         { onConflict: 'tenant_id' }
       );
 
-      return NextResponse.json({ status: 'connecting', qrCode: qr, expiresAt });
+      return NextResponse.json({ status: 'connecting', qrCode: qr, expiresAt, _debug: debugInfo });
     }
 
     // 3d. Existe pero desconectada -> pedir nuevo QR
@@ -118,16 +121,35 @@ export async function POST() {
       { onConflict: 'tenant_id' }
     );
 
-    return NextResponse.json({ status: 'connecting', qrCode: qr, expiresAt });
+    return NextResponse.json({ status: 'connecting', qrCode: qr, expiresAt, _debug: debugInfo });
+
   } catch (e) {
     if (e instanceof EvolutionApiError) {
-      console.error(`[whatsapp/connect] EvolutionApiError statusCode=${e.statusCode} message="${e.message}" body=`, JSON.stringify(e.body));
+      // Devuelve el error completo en el body — visible en Network tab del browser
       return NextResponse.json(
-        { error: 'WhatsApp service unavailable. Please try again.' },
+        {
+          error: 'WhatsApp service unavailable. Please try again.',
+          _debug: {
+            ...debugInfo,
+            evolutionError: {
+              statusCode: e.statusCode,
+              message: e.message,
+              body: e.body,
+            },
+          },
+        },
         { status: 502 }
       );
     }
-    console.error('[whatsapp/connect] Unexpected error:', e);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        _debug: {
+          ...debugInfo,
+          unexpectedError: String(e),
+        },
+      },
+      { status: 500 }
+    );
   }
 }
