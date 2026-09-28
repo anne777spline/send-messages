@@ -58,7 +58,9 @@ export async function GET(request: Request) {
       const conditions = [
         `building_name.ilike.%${term}%`,
         `owner_name.ilike.%${term}%`,
-        `unit_number.ilike.%${term}%`
+        `unit_number.ilike.%${term}%`,
+        `rooms.ilike.%${term}%`,
+        `area_en.ilike.%${term}%`
       ];
 
       if (digitsOnly.length > 0) {

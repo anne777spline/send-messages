@@ -823,7 +823,7 @@ export default function Home() {
               <div className="relative flex-1 w-full">
                 <input
                   type="text"
-                  placeholder="Search by building, owner name, phone, unit..."
+                  placeholder="Search by building, owner, type (e.g. Studio, 1 Bed), unit, phone..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-4 py-2.5 text-sm text-white placeholder-[#666666] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -928,7 +928,7 @@ export default function Home() {
                   <p className="text-base text-[#aaaaaa]">
                     {hasSearched
                       ? 'No properties found matching your search.'
-                      : 'Search by keyword (e.g. building name, owner, phone) or select a building above.'}
+                      : 'Search by keyword (e.g. building name, property type/Studio, owner, phone) or select a building above.'}
                   </p>
                   <p className="text-xs text-[#666666] max-w-sm text-center">
                     Tip: Select properties using the checkboxes to send them a personalized message.
