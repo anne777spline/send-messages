@@ -71,7 +71,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No contacts found.' }, { status: 404 });
   }
 
-  const leads = allContacts.map((row) => {
+  // Deduplicate contacts by phone number to avoid sending multiple messages to the same person
+  const uniqueContactsMap = new Map();
+  for (const contact of allContacts) {
+    if (contact.phone && !uniqueContactsMap.has(contact.phone)) {
+      uniqueContactsMap.set(contact.phone, contact);
+    }
+  }
+  const uniqueContacts = Array.from(uniqueContactsMap.values());
+
+  const leads = uniqueContacts.map((row) => {
     let message = template || "Good day, I hope you're doing well.";
     message = message
       .replace(/{owner_name}/gi, row.owner_name || '')

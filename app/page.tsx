@@ -902,23 +902,29 @@ export default function Home() {
                 </button>
                 {isRoomsOpen && (
                   <div className="absolute top-full left-0 mt-1 w-full bg-[#181818] border border-[#3a3a3a] rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
-                    {roomsOptions.map(room => (
-                      <label key={room} className="flex items-center gap-2 px-3 py-2 hover:bg-[#2d2d2d] cursor-pointer text-sm text-white">
-                        <input
-                          type="checkbox"
-                          checked={selectedRooms.includes(room)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedRooms([...selectedRooms, room]);
-                            } else {
-                              setSelectedRooms(selectedRooms.filter(r => r !== room));
-                            }
-                          }}
-                          className="rounded border-[#3a3a3a] bg-[#222222] text-blue-500 focus:ring-blue-500"
-                        />
-                        {room}
-                      </label>
-                    ))}
+                    {roomsLoading ? (
+                      <div className="px-3 py-3 text-sm text-[#888888] text-center">Loading types...</div>
+                    ) : roomsOptions.length === 0 ? (
+                      <div className="px-3 py-3 text-sm text-[#888888] text-center">No types found</div>
+                    ) : (
+                      roomsOptions.map(room => (
+                        <label key={room} className="flex items-center gap-2 px-3 py-2 hover:bg-[#2d2d2d] cursor-pointer text-sm text-white">
+                          <input
+                            type="checkbox"
+                            checked={selectedRooms.includes(room)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedRooms([...selectedRooms, room]);
+                              } else {
+                                setSelectedRooms(selectedRooms.filter(r => r !== room));
+                              }
+                            }}
+                            className="rounded border-[#3a3a3a] bg-[#222222] text-blue-500 focus:ring-blue-500"
+                          />
+                          {room}
+                        </label>
+                      ))
+                    )}
                   </div>
                 )}
               </div>
