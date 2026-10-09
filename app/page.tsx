@@ -85,10 +85,20 @@ export default function Home() {
       }
     }
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setAuthChecking(false);
-    });
+    const checkSessionWithTimeout = async () => {
+      try {
+        const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve({ data: { session: null } }), 3000));
+        const sessionPromise = supabase.auth.getSession();
+        const { data: { session: s } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        setSession(s);
+      } catch (err) {
+        console.error("Error getting session:", err);
+        setSession(null);
+      } finally {
+        setAuthChecking(false);
+      }
+    };
+    checkSessionWithTimeout();
 
     const {
       data: { subscription },
