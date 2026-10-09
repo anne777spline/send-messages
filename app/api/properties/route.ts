@@ -16,6 +16,7 @@ export async function GET(request: Request) {
   const supabase = createServerSupabase();
   const { searchParams } = new URL(request.url);
   const building = searchParams.get('building');
+  const roomsParam = searchParams.get('rooms');
   const search = searchParams.get('search') || searchParams.get('phone') || searchParams.get('q');
   const action = searchParams.get('action');
 
@@ -40,6 +41,26 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: true, count: uniqueSorted.length, buildings: uniqueSorted });
     }
 
+    if (action === 'rooms') {
+      const set = new Set<string>();
+      for (let p = 0; p < 65; p++) {
+        const { data, error } = await supabase
+          .from('properties')
+          .select('rooms')
+          .eq('tenant_id', tenant.tenantId)
+          .not('rooms', 'is', null)
+          .range(p * 1000, (p + 1) * 1000 - 1);
+        if (error || !data || data.length === 0) break;
+        data.forEach((r: any) => {
+          if (r.rooms && r.rooms.trim()) {
+            set.add(r.rooms.trim());
+          }
+        });
+      }
+      const uniqueSorted = Array.from(set).sort((a, b) => a.localeCompare(b));
+      return NextResponse.json({ success: true, count: uniqueSorted.length, rooms: uniqueSorted });
+    }
+
     let query = supabase
       .from('properties')
       .select('id, phone, owner_name, building_name, unit_number, rooms, size_sqm, email')
@@ -59,7 +80,6 @@ export async function GET(request: Request) {
         `building_name.ilike.%${term}%`,
         `owner_name.ilike.%${term}%`,
         `unit_number.ilike.%${term}%`,
-        `rooms.ilike.%${term}%`,
         `area_en.ilike.%${term}%`
       ];
 
@@ -69,6 +89,13 @@ export async function GET(request: Request) {
       }
 
       query = query.or(conditions.join(','));
+    }
+
+    if (roomsParam && roomsParam.trim()) {
+      const selectedRooms = roomsParam.split(',').map(r => r.trim()).filter(Boolean);
+      if (selectedRooms.length > 0) {
+        query = query.in('rooms', selectedRooms);
+      }
     }
 
     const MAX_RESULTS = 2500;

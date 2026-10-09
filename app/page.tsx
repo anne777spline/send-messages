@@ -58,6 +58,10 @@ export default function Home() {
   // Properties & Messaging State
   const [buildings, setBuildings] = useState<string[]>([]);
   const [selectedBuilding, setSelectedBuilding] = useState<string>('');
+  const [roomsOptions, setRoomsOptions] = useState<string[]>([]);
+  const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
+  const [roomsLoading, setRoomsLoading] = useState<boolean>(false);
+  const [isRoomsOpen, setIsRoomsOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [template, setTemplate] = useState<string>(
     "Good day {owner_name}, I hope you're doing well. Reaching out regarding your property in {building_name} (Unit {unit_number})."
@@ -220,11 +224,27 @@ export default function Home() {
     }
   }, []);
 
+  const loadRooms = useCallback(async () => {
+    setRoomsLoading(true);
+    try {
+      const res = await fetch('/api/properties?action=rooms');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.rooms)) {
+        setRoomsOptions(data.rooms);
+      }
+    } catch (err) {
+      console.error('Error loading rooms:', err);
+    } finally {
+      setRoomsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (session) {
       loadBuildings();
+      loadRooms();
     }
-  }, [session, loadBuildings]);
+  }, [session, loadBuildings, loadRooms]);
 
   // 7. Search Properties
   const handleSearch = async (e?: React.FormEvent) => {
@@ -235,6 +255,7 @@ export default function Home() {
     try {
       const params = new URLSearchParams();
       if (selectedBuilding.trim()) params.append('building', selectedBuilding.trim());
+      if (selectedRooms.length > 0) params.append('rooms', selectedRooms.join(','));
       if (searchTerm.trim()) params.append('search', searchTerm.trim());
 
       const res = await fetch(`/api/properties?${params.toString()}`);
@@ -258,6 +279,7 @@ export default function Home() {
 
   const handleClearFilters = () => {
     setSelectedBuilding('');
+    setSelectedRooms([]);
     setSearchTerm('');
     setResults([]);
     setSelectedIds(new Set());
@@ -833,7 +855,7 @@ export default function Home() {
               <div className="relative flex-1 w-full">
                 <input
                   type="text"
-                  placeholder="Search by building, owner, type (e.g. Studio, 1 Bed), unit, phone..."
+                  placeholder="Search by building, owner, unit, phone..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-4 py-2.5 text-sm text-white placeholder-[#666666] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -867,6 +889,40 @@ export default function Home() {
                 </select>
               </div>
 
+              {/* Rooms Multi-Select Dropdown */}
+              <div className="relative w-full sm:w-48 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsRoomsOpen(!isRoomsOpen)}
+                  className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-3.5 py-2.5 text-sm text-white flex justify-between items-center focus:outline-none focus:border-blue-500 cursor-pointer"
+                >
+                  <span className="truncate">
+                    {roomsLoading ? 'Loading...' : selectedRooms.length === 0 ? 'All Types' : `${selectedRooms.length} Types Selected`}
+                  </span>
+                </button>
+                {isRoomsOpen && (
+                  <div className="absolute top-full left-0 mt-1 w-full bg-[#181818] border border-[#3a3a3a] rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
+                    {roomsOptions.map(room => (
+                      <label key={room} className="flex items-center gap-2 px-3 py-2 hover:bg-[#2d2d2d] cursor-pointer text-sm text-white">
+                        <input
+                          type="checkbox"
+                          checked={selectedRooms.includes(room)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedRooms([...selectedRooms, room]);
+                            } else {
+                              setSelectedRooms(selectedRooms.filter(r => r !== room));
+                            }
+                          }}
+                          className="rounded border-[#3a3a3a] bg-[#222222] text-blue-500 focus:ring-blue-500"
+                        />
+                        {room}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Search Button */}
               <button
                 type="submit"
@@ -878,7 +934,7 @@ export default function Home() {
               </button>
 
               {/* Clear button if search is active */}
-              {(searchTerm || selectedBuilding) && (
+              {(searchTerm || selectedBuilding || selectedRooms.length > 0) && (
                 <button
                   type="button"
                   onClick={handleClearFilters}
