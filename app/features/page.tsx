@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Upload, MessageSquare, Smartphone, Users, CheckCheck, ArrowRight, FileSpreadsheet, ShieldCheck } from 'lucide-react';
+import { Sparkles, MessageSquare, Smartphone, Filter, CheckCheck } from 'lucide-react';
 
 export default function FeaturesPage() {
   return (
@@ -31,7 +30,7 @@ export default function FeaturesPage() {
           </div>
           <div className="lg:col-span-5 pb-1">
             <p className="text-base sm:text-lg text-gray-600 leading-relaxed font-normal border-l-2 border-gray-950/20 pl-5">
-              Everything real estate brokers need to locate property owners, parse portfolio spreadsheets, and initiate direct conversations without third-party fees.
+              Everything real estate professionals need to import owner lists from any country, organize building portfolios, and start direct WhatsApp conversations effortlessly.
             </p>
           </div>
         </div>
@@ -42,16 +41,32 @@ export default function FeaturesPage() {
           <div className="bg-white/90 backdrop-blur-md border border-gray-200/90 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-6 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-md">
-                <Upload className="w-6 h-6 text-blue-400" />
+                <Sparkles className="w-6 h-6 text-blue-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-950 tracking-tight">1-Click CSV Portfolio Import</h2>
+              <h2 className="text-2xl font-bold text-gray-950 tracking-tight">AI-Powered Universal Import</h2>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Upload raw CSV files containing landlord names, phone numbers, unit numbers, and building details. Our automated parser organizes and updates your dedicated broker database instantly.
+                Upload any CSV spreadsheet in any language or column order. Our built-in AI automatically identifies Owner Names, Phone Numbers, Buildings, Units, and Sizes—while cleaning up blank rows and formatting local phone numbers for you.
               </p>
             </div>
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200/80 font-mono text-xs text-gray-600 flex items-center justify-between">
-              <span>owner_name, phone, building, unit</span>
-              <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-md">Auto-Parsed</span>
+              <span>Any spreadsheet layout &bull; Any country</span>
+              <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-md">AI Auto-Mapped</span>
+            </div>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md border border-gray-200/90 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-6 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-md">
+                <Filter className="w-6 h-6 text-blue-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Smart Preview &amp; Unlimited File Size</h2>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Preview your clean contacts before saving, convert Square Feet to Square Meters with one click, or filter a huge city-wide file to import only a single building—all without file size limits or browser freezes.
+              </p>
+            </div>
+            <div className="flex items-center justify-between bg-gray-50 border border-gray-200/80 p-4 rounded-2xl text-xs text-gray-700 font-medium">
+              <span>Import 50 or 100,000+ properties smoothly</span>
+              <span className="bg-gray-900 text-white font-bold px-3 py-1 rounded-full text-[10px]">No Size Limits</span>
             </div>
           </div>
 
@@ -60,9 +75,9 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-md">
                 <MessageSquare className="w-6 h-6 text-blue-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Dynamic Variable Templates</h2>
+              <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Dynamic Personal Templates</h2>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Craft personalized outreach templates using live tags like <code className="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-mono">&#123;owner_name&#125;</code>, <code className="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-mono">&#123;building_name&#125;</code>, and <code className="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-mono">&#123;unit_number&#125;</code> for tailored owner communication.
+                Write natural outreach messages using smart tags like <code className="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-mono">&#123;owner_name&#125;</code>, <code className="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-mono">&#123;building_name&#125;</code>, and <code className="bg-gray-100 px-1.5 py-0.5 rounded text-blue-600 font-mono">&#123;unit_number&#125;</code> so every landlord receives a message tailored to their exact property.
               </p>
             </div>
             <div className="bg-gray-900 text-gray-200 rounded-2xl p-4 border border-gray-800 text-xs leading-relaxed">
@@ -75,30 +90,14 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-md">
                 <Smartphone className="w-6 h-6 text-blue-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Dedicated WhatsApp QR Pairing</h2>
+              <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Direct WhatsApp QR Pairing</h2>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Link your own WhatsApp phone number in seconds by scanning an encrypted QR code. No third-party phone numbers or untrusted sender aliases are used.
+                Connect your own WhatsApp number in seconds by scanning a QR code. Select individual landlords or an entire building and launch your outreach directly from your trusted personal or business line.
               </p>
             </div>
             <div className="flex items-center gap-3 bg-gray-50 border border-gray-200/80 p-4 rounded-2xl text-xs text-gray-700 font-medium">
               <CheckCheck className="w-4 h-4 text-blue-500 flex-shrink-0" />
-              <span>Direct sender reputation — messages appear as originating directly from your personal or business line.</span>
-            </div>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-md border border-gray-200/90 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-6 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-md">
-                <Users className="w-6 h-6 text-blue-400" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Multi-Select Campaign Dispatch</h2>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Select specific property owners or select an entire building with a single click. Dispatch campaigns to 10 or 500 owners with real-time status feedback.
-              </p>
-            </div>
-            <div className="flex items-center justify-between bg-gray-50 border border-gray-200/80 p-4 rounded-2xl text-xs text-gray-700 font-medium">
-              <span>Batch Outreach Control</span>
-              <span className="bg-gray-900 text-white font-bold px-3 py-1 rounded-full text-[10px]">100% Delivery Tracked</span>
+              <span>Higher response rates — messages arrive directly from your own phone number.</span>
             </div>
           </div>
 

@@ -25,6 +25,8 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
     { label: 'Overview', href: '/overview' },
     { label: 'Features', href: '/features' },
     { label: 'Services', href: '/services' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
   ];
 
   return (

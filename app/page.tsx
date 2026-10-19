@@ -28,6 +28,8 @@ import { createClientBrowser } from '@/lib/supabaseBrowser';
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import AiImportModal from '@/components/AiImportModal';
+import type { DetectedSchema } from '@/app/api/import/detect-schema/route';
 
 type WhatsAppStatus = 'not_created' | 'connecting' | 'connected' | 'disconnected' | 'error';
 
@@ -72,11 +74,19 @@ export default function Home() {
   const [buildingsLoading, setBuildingsLoading] = useState<boolean>(false);
   const [sending, setSending] = useState<boolean>(false);
   const [uploading, setUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<string>('');
   const [dispatchResult, setDispatchResult] = useState<any>(null);
   const [importResult, setImportResult] = useState<any>(null);
   const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Universal AI Import Modal State
+  const [aiModalOpen, setAiModalOpen] = useState<boolean>(false);
+  const [csvCleanLines, setCsvCleanLines] = useState<string[]>([]);
+  const [csvFileName, setCsvFileName] = useState<string>('');
+  const [detectedSchema, setDetectedSchema] = useState<DetectedSchema | null>(null);
+  const [aiProvider, setAiProvider] = useState<string>('mistral-ai');
 
   // 1. Session Check, URL Code Handler & Auth Listener
   useEffect(() => {
@@ -311,25 +321,72 @@ export default function Home() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setUploadProgress('Reading file...');
     setImportResult(null);
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const res = await fetch('/api/import', { method: 'POST', body: formData });
-      const data = await res.json();
-      setImportResult(data);
-      if (data.success) {
-        await loadBuildings();
-        handleSearch();
+      // 1. Read file text in the browser
+      const rawText = await file.text();
+      setUploadProgress('Cleaning empty rows...');
+
+      // 2. Filter empty lines & Excel trailing comma lines (e.g. ,,,,,,,,,,,,,,,,,,,,,,,)
+      const allLines = rawText.split(/\r?\n/);
+      const cleanLines: string[] = [];
+
+      for (let i = 0; i < allLines.length; i++) {
+        const line = allLines[i].trim();
+        if (!line) continue;
+        if (line.replace(/,/g, '').trim().length === 0) continue;
+        cleanLines.push(line);
       }
+
+      if (cleanLines.length < 2) {
+        throw new Error('No valid data records found in this CSV.');
+      }
+
+      // 3. Call Mistral AI to detect CSV schema and regional context
+      setUploadProgress('AI analyzing columns...');
+      const sampleLines = cleanLines.slice(0, 8);
+
+      const detectRes = await fetch('/api/import/detect-schema', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sampleLines,
+          fileName: file.name
+        })
+      });
+
+      if (!detectRes.ok) {
+        throw new Error(`Failed to analyze CSV structure (${detectRes.status})`);
+      }
+
+      const detectData = await detectRes.json();
+      if (!detectData.success || !detectData.schema) {
+        throw new Error(detectData.error || 'Could not detect CSV schema.');
+      }
+
+      setCsvCleanLines(cleanLines);
+      setCsvFileName(file.name);
+      setDetectedSchema(detectData.schema);
+      setAiProvider(detectData.provider || 'mistral-ai');
+      setAiModalOpen(true);
     } catch (err: any) {
-      setImportResult({ success: false, error: err.message || 'Error uploading file' });
+      setImportResult({ success: false, error: err.message || 'Error analyzing CSV file' });
     } finally {
       setUploading(false);
+      setUploadProgress('');
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
+  };
+
+  const handleAiImportSuccess = async (totalImported: number) => {
+    setAiModalOpen(false);
+    setCsvCleanLines([]);
+    setImportResult({ success: true, total_processed: totalImported });
+    await loadBuildings();
+    await loadRooms();
+    handleSearch();
   };
 
   const handleDispatch = async () => {
@@ -735,7 +792,7 @@ export default function Home() {
                   {uploading ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-400" />
-                      <span>Importing...</span>
+                      <span>{uploadProgress || 'Importing...'}</span>
                     </>
                   ) : (
                     <>
@@ -1107,6 +1164,21 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {detectedSchema && (
+        <AiImportModal
+          isOpen={aiModalOpen}
+          fileName={csvFileName}
+          allCleanLines={csvCleanLines}
+          initialSchema={detectedSchema}
+          provider={aiProvider}
+          onClose={() => {
+            setAiModalOpen(false);
+            setCsvCleanLines([]);
+          }}
+          onImportSuccess={handleAiImportSuccess}
+        />
+      )}
     </main>
   );
 }
