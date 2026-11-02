@@ -25,7 +25,7 @@ export default function AboutPage() {
           <div className="lg:col-span-7">
             <h1 className="font-pagani text-4xl sm:text-5xl lg:text-6xl font-light text-gray-950 leading-[1.1] tracking-tight">
               Built For Global <br />
-              <span className="font-serif-accent italic font-normal text-black text-[1.08em]">Real Estate</span> <br />
+              <span className="font-serif-accent italic font-normal text-gray-950 text-[1.08em]">Real Estate</span> <br />
               <span className="font-normal text-gray-900">Professionals</span>
             </h1>
           </div>

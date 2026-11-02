@@ -24,7 +24,7 @@ export default function OverviewPage() {
         <div className="lg:col-span-6 space-y-8">
           <h1 className="font-pagani text-4xl sm:text-5xl lg:text-6xl font-light text-gray-950 leading-[1.12] tracking-tight">
             Built Specifically <br />
-            <span className="font-serif-accent italic font-normal text-black text-[1.08em]">For Real Estate</span> <br />
+            <span className="font-serif-accent italic font-normal text-gray-950 text-[1.08em]">For Real Estate</span> <br />
             <span className="font-normal text-gray-900">Brokers</span>
           </h1>
           <p className="text-base sm:text-lg text-gray-600 max-w-xl font-normal leading-relaxed">

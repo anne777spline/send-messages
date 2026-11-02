@@ -478,7 +478,7 @@ export default function Home() {
           <div className="lg:col-span-6 space-y-8">
             <h1 className="font-pagani text-4xl sm:text-5xl lg:text-6xl font-light text-gray-950 leading-[1.12] tracking-tight">
               An easier <br />
-              <span className="font-serif-accent italic font-normal text-black text-[1.08em]">Direct Outreach</span> <br />
+              <span className="font-serif-accent italic font-normal text-gray-950 text-[1.08em]">Direct Outreach</span> <br />
               <span className="font-normal text-gray-900">for Brokers</span>
             </h1>
 
