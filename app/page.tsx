@@ -24,7 +24,8 @@ import {
   CheckCheck,
   ArrowRight,
   Sun,
-  Moon
+  Moon,
+  ChevronDown
 } from 'lucide-react';
 import { createClientBrowser } from '@/lib/supabaseBrowser';
 
@@ -34,6 +35,36 @@ import AiImportModal from '@/components/AiImportModal';
 import type { DetectedSchema } from '@/app/api/import/detect-schema/route';
 
 type WhatsAppStatus = 'not_created' | 'connecting' | 'connected' | 'disconnected' | 'error';
+
+function formatRoomLabel(val: string): string {
+  if (!val) return '';
+  const trimmed = String(val).trim();
+  const lower = trimmed.toLowerCase();
+
+  // If already contains words like bed, br, studio, room, penthouse, etc.
+  if (
+    lower.includes('bed') ||
+    lower.includes('br') ||
+    lower.includes('studio') ||
+    lower.includes('room') ||
+    lower.includes('penthouse') ||
+    lower.includes('duplex') ||
+    lower.includes('villa')
+  ) {
+    return trimmed;
+  }
+
+  // If it's a pure number like "1", "2", "3", etc.
+  const num = parseInt(trimmed, 10);
+  if (!isNaN(num) && String(num) === trimmed) {
+    if (num === 0) return 'Studio';
+    if (num === 1) return '1 Bedroom';
+    return `${num} Bedrooms`;
+  }
+
+  // If decimal like "1.5" or other
+  return `${trimmed} Rooms`;
+}
 
 export default function Home() {
   const [supabase] = useState(() => createClientBrowser());
@@ -83,11 +114,29 @@ export default function Home() {
   // Properties & Messaging State
   const [buildings, setBuildings] = useState<string[]>([]);
   const [selectedBuilding, setSelectedBuilding] = useState<string>('');
+  const [isBuildingOpen, setIsBuildingOpen] = useState<boolean>(false);
+  const [buildingSearch, setBuildingSearch] = useState<string>('');
   const [roomsOptions, setRoomsOptions] = useState<string[]>([]);
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
   const [roomsLoading, setRoomsLoading] = useState<boolean>(false);
   const [isRoomsOpen, setIsRoomsOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const buildingDropdownRef = useRef<HTMLDivElement>(null);
+  const roomsDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (buildingDropdownRef.current && !buildingDropdownRef.current.contains(event.target as Node)) {
+        setIsBuildingOpen(false);
+      }
+      if (roomsDropdownRef.current && !roomsDropdownRef.current.contains(event.target as Node)) {
+        setIsRoomsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const [template, setTemplate] = useState<string>(
     "Good day {owner_name}, I hope you're doing well. Reaching out regarding your property in {building_name} (Unit {unit_number})."
   );
@@ -968,7 +1017,11 @@ export default function Home() {
                     key={item.tag}
                     type="button"
                     onClick={() => insertTag(item.tag)}
-                    className="bg-[#89c900]/15 hover:bg-[#89c900]/25 text-gray-950 text-xs px-2.5 py-1 rounded-lg border border-[#89c900]/40 transition cursor-pointer font-medium"
+                    className={`text-xs px-2.5 py-1 rounded-lg border transition cursor-pointer font-medium ${
+                      isDark
+                        ? 'bg-[#89c900]/15 hover:bg-[#89c900]/25 text-[#d8e454] border-[#89c900]/40'
+                        : 'bg-[#89c900]/15 hover:bg-[#89c900]/25 text-gray-900 border-[#89c900]/40'
+                    }`}
                   >
                     {item.label}
                   </button>
@@ -990,9 +1043,19 @@ export default function Home() {
                 type="button"
                 onClick={handleDispatch}
                 disabled={sending || selectedIds.size === 0}
-                className="w-full bg-[#89c900] text-gray-950 font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-[#7bb700] enabled:active:bg-[#6fa500] enabled:cursor-pointer"
+                className={`w-full font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-sm cursor-pointer ${
+                  sending || selectedIds.size === 0
+                    ? isDark
+                      ? 'bg-[#2a2a2a] text-[#666666] border border-[#383838] cursor-not-allowed shadow-none'
+                      : 'bg-gray-200 text-gray-500 border border-gray-300/80 cursor-not-allowed shadow-none'
+                    : 'bg-[#89c900] hover:bg-[#7bb700] active:bg-[#6fa500] text-gray-950 shadow-md cursor-pointer'
+                }`}
               >
-                {sending ? <RefreshCw className="w-4 h-4 animate-spin text-gray-950" /> : <Send className="w-4 h-4 text-gray-950" />}
+                {sending ? (
+                  <RefreshCw className={`w-4 h-4 animate-spin ${selectedIds.size === 0 ? (isDark ? 'text-[#666666]' : 'text-gray-500') : 'text-gray-950'}`} />
+                ) : (
+                  <Send className={`w-4 h-4 ${selectedIds.size === 0 ? (isDark ? 'text-[#666666]' : 'text-gray-500') : 'text-gray-950'}`} />
+                )}
                 <span>
                   {sending
                     ? 'Sending Messages...'
@@ -1035,14 +1098,14 @@ export default function Home() {
             {/* Inline Search Bar */}
             <form
               onSubmit={handleSearch}
-              className={`rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-3 border transition-colors ${
+              className={`rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-3 border transition-colors relative z-30 ${
                 isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 backdrop-blur-md border-gray-200/90 shadow-sm'
               }`}
             >
-              <div className="relative flex-1 w-full">
+              <div className="relative flex-1 min-w-[180px] w-full">
                 <input
                   type="text"
-                  placeholder="Search by building, owner, unit, phone..."
+                  placeholder="Search building, owner, unit..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   className={`w-full rounded-xl px-4 py-2.5 text-sm border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
@@ -1064,52 +1127,138 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Exact Building Select Dropdown */}
-              <div className="w-full sm:w-64 flex-shrink-0">
-                <select
-                  value={selectedBuilding}
-                  onChange={e => setSelectedBuilding(e.target.value)}
-                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm border focus:outline-none focus:border-blue-500 text-ellipsis cursor-pointer ${
+              {/* Custom Styled Building Select Dropdown */}
+              <div ref={buildingDropdownRef} className="relative w-full sm:w-64 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsBuildingOpen(!isBuildingOpen);
+                    setIsRoomsOpen(false);
+                  }}
+                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border transition focus:outline-none focus:border-blue-500 cursor-pointer ${
                     isDark
-                      ? 'bg-[#181818] border-[#3a3a3a] text-white'
-                      : 'bg-gray-50 border-gray-200 text-gray-900'
+                      ? 'bg-[#181818] border-[#3a3a3a] text-white hover:border-[#555555]'
+                      : 'bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300'
                   }`}
                 >
-                  <option value="">
-                    {buildingsLoading ? 'Loading buildings...' : `All Buildings (${buildings.length.toLocaleString()})`}
-                  </option>
-                  {buildings.map(b => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
-                  ))}
-                </select>
+                  <span className="truncate pr-2">
+                    {buildingsLoading
+                      ? 'Loading buildings...'
+                      : selectedBuilding || `All Buildings (${buildings.length.toLocaleString()})`}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isBuildingOpen ? 'rotate-180' : ''} ${isDark ? 'text-[#888888]' : 'text-gray-500'}`} />
+                </button>
+
+                {isBuildingOpen && (
+                  <div
+                    className={`absolute top-full left-0 mt-1.5 w-full rounded-xl border shadow-2xl z-50 overflow-hidden ${
+                      isDark ? 'bg-[#1e1e1e] border-[#3a3a3a]' : 'bg-white border-gray-200'
+                    }`}
+                  >
+                    {/* Optional Quick Filter input if list is long */}
+                    {buildings.length > 6 && (
+                      <div className={`p-2 border-b ${isDark ? 'border-[#2d2d2d] bg-[#181818]' : 'border-gray-100 bg-gray-50'}`}>
+                        <input
+                          type="text"
+                          placeholder="Filter buildings..."
+                          value={buildingSearch}
+                          onChange={e => setBuildingSearch(e.target.value)}
+                          className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                            isDark
+                              ? 'bg-[#222222] border-[#333333] text-white placeholder-[#777777] focus:border-blue-500'
+                              : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'
+                          }`}
+                        />
+                      </div>
+                    )}
+
+                    <div className="max-h-60 overflow-y-auto py-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedBuilding('');
+                          setIsBuildingOpen(false);
+                          setBuildingSearch('');
+                        }}
+                        className={`w-full text-left px-3.5 py-2 text-sm flex items-center justify-between transition cursor-pointer ${
+                          !selectedBuilding
+                            ? isDark
+                              ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                              : 'bg-blue-50 text-blue-600 font-semibold'
+                            : isDark
+                            ? 'hover:bg-[#2a2a2a] text-white'
+                            : 'hover:bg-gray-50 text-gray-800'
+                        }`}
+                      >
+                        <span>All Buildings ({buildings.length.toLocaleString()})</span>
+                        {!selectedBuilding && <Check className="w-3.5 h-3.5 text-blue-500" />}
+                      </button>
+
+                      {buildings
+                        .filter(b => b.toLowerCase().includes(buildingSearch.toLowerCase()))
+                        .map(b => (
+                          <button
+                            key={b}
+                            type="button"
+                            onClick={() => {
+                              setSelectedBuilding(b);
+                              setIsBuildingOpen(false);
+                              setBuildingSearch('');
+                            }}
+                            className={`w-full text-left px-3.5 py-2 text-sm flex items-center justify-between transition cursor-pointer ${
+                              selectedBuilding === b
+                                ? isDark
+                                  ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                                  : 'bg-blue-50 text-blue-600 font-semibold'
+                                : isDark
+                                ? 'hover:bg-[#2a2a2a] text-[#cccccc] hover:text-white'
+                                : 'hover:bg-gray-50 text-gray-800'
+                            }`}
+                          >
+                            <span className="truncate pr-2">{b}</span>
+                            {selectedBuilding === b && <Check className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Rooms Multi-Select Dropdown */}
-              <div className="relative w-full sm:w-48 flex-shrink-0">
+              <div ref={roomsDropdownRef} className="relative w-full sm:w-52 flex-shrink-0">
                 <button
                   type="button"
-                  onClick={() => setIsRoomsOpen(!isRoomsOpen)}
-                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border focus:outline-none focus:border-blue-500 cursor-pointer ${
+                  onClick={() => {
+                    setIsRoomsOpen(!isRoomsOpen);
+                    setIsBuildingOpen(false);
+                  }}
+                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border transition focus:outline-none focus:border-blue-500 cursor-pointer ${
                     isDark
-                      ? 'bg-[#181818] border-[#3a3a3a] text-white'
-                      : 'bg-gray-50 border-gray-200 text-gray-900'
+                      ? 'bg-[#181818] border-[#3a3a3a] text-white hover:border-[#555555]'
+                      : 'bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300'
                   }`}
                 >
-                  <span className="truncate">
-                    {roomsLoading ? 'Loading...' : selectedRooms.length === 0 ? 'All Types' : `${selectedRooms.length} Types Selected`}
+                  <span className="truncate pr-2">
+                    {roomsLoading
+                      ? 'Loading bedrooms...'
+                      : selectedRooms.length === 0
+                      ? 'All Bedrooms / Types'
+                      : selectedRooms.length === 1
+                      ? formatRoomLabel(selectedRooms[0])
+                      : `${selectedRooms.length} Types Selected`}
                   </span>
+                  <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isRoomsOpen ? 'rotate-180' : ''} ${isDark ? 'text-[#888888]' : 'text-gray-500'}`} />
                 </button>
+
                 {isRoomsOpen && (
                   <div
-                    className={`absolute top-full left-0 mt-1 w-full rounded-xl border shadow-xl z-50 max-h-60 overflow-y-auto ${
-                      isDark ? 'bg-[#181818] border-[#3a3a3a]' : 'bg-white border-gray-200'
+                    className={`absolute top-full left-0 mt-1.5 w-full rounded-xl border shadow-2xl z-50 max-h-60 overflow-y-auto py-1 ${
+                      isDark ? 'bg-[#1e1e1e] border-[#3a3a3a]' : 'bg-white border-gray-200'
                     }`}
                   >
                     {roomsLoading ? (
                       <div className={`px-3 py-3 text-sm text-center ${isDark ? 'text-[#888888]' : 'text-gray-400'}`}>
-                        Loading types...
+                        Loading bedrooms...
                       </div>
                     ) : roomsOptions.length === 0 ? (
                       <div className={`px-3 py-3 text-sm text-center ${isDark ? 'text-[#888888]' : 'text-gray-400'}`}>
@@ -1119,8 +1268,8 @@ export default function Home() {
                       roomsOptions.map(room => (
                         <label
                           key={room}
-                          className={`flex items-center gap-2 px-3 py-2 cursor-pointer text-sm transition ${
-                            isDark ? 'hover:bg-[#2d2d2d] text-white' : 'hover:bg-gray-50 text-gray-900'
+                          className={`flex items-center gap-2.5 px-3.5 py-2 cursor-pointer text-sm transition ${
+                            isDark ? 'hover:bg-[#2a2a2a] text-white' : 'hover:bg-gray-50 text-gray-900'
                           }`}
                         >
                           <input
@@ -1133,9 +1282,9 @@ export default function Home() {
                                 setSelectedRooms(selectedRooms.filter(r => r !== room));
                               }
                             }}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                           />
-                          {room}
+                          <span className="truncate">{formatRoomLabel(room)}</span>
                         </label>
                       ))
                     )}
@@ -1148,7 +1297,7 @@ export default function Home() {
                 type="submit"
                 disabled={loading}
                 title="Search Properties"
-                className="bg-[#89c900] hover:bg-[#7bb700] active:bg-[#6fa500] disabled:opacity-50 text-gray-950 font-bold p-2.5 rounded-xl flex items-center justify-center transition shadow-md flex-shrink-0 w-full sm:w-11 h-10 cursor-pointer"
+                className="bg-[#89c900] hover:bg-[#7bb700] active:bg-[#6fa500] disabled:opacity-50 text-gray-950 font-bold px-3.5 h-[42px] rounded-xl flex items-center justify-center transition shadow-sm flex-shrink-0 w-full sm:w-11 cursor-pointer"
               >
                 {loading ? <RefreshCw className="w-5 h-5 animate-spin text-gray-950" /> : <Search className="w-5 h-5 text-gray-950" />}
               </button>
@@ -1159,8 +1308,10 @@ export default function Home() {
                   type="button"
                   onClick={handleClearFilters}
                   title="Clear all filters"
-                  className={`p-2.5 rounded-xl transition flex items-center justify-center flex-shrink-0 w-full sm:w-10 h-10 cursor-pointer ${
-                    isDark ? 'text-[#888888] hover:text-white hover:bg-[#2d2d2d]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
+                  className={`h-[42px] px-3.5 rounded-xl border transition flex items-center justify-center flex-shrink-0 w-full sm:w-11 cursor-pointer shadow-sm ${
+                    isDark
+                      ? 'bg-[#181818] border-[#3a3a3a] text-[#aaaaaa] hover:text-white hover:bg-[#252525] hover:border-[#555555]'
+                      : 'bg-white border-gray-200 text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                 >
                   <X className="w-5 h-5" />
@@ -1182,7 +1333,13 @@ export default function Home() {
                 <div className="flex items-center gap-3">
                   <h2 className={`text-lg font-semibold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-950'}`}>
                     <span>Properties Found</span>
-                    <span className="text-xs bg-[#89c900]/15 text-gray-950 border border-[#89c900]/40 px-2.5 py-0.5 rounded-full font-mono font-medium">
+                    <span
+                      className={`text-xs border px-2.5 py-0.5 rounded-full font-mono font-medium ${
+                        isDark
+                          ? 'bg-[#89c900]/15 text-[#d8e454] border-[#89c900]/40'
+                          : 'bg-[#89c900]/15 text-gray-900 border-[#89c900]/40'
+                      }`}
+                    >
                       {results.length.toLocaleString()}
                     </span>
                   </h2>
