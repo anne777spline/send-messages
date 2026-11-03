@@ -22,7 +22,9 @@ import {
   MessageSquare,
   Users,
   CheckCheck,
-  ArrowRight
+  ArrowRight,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { createClientBrowser } from '@/lib/supabaseBrowser';
 
@@ -38,6 +40,27 @@ export default function Home() {
   const [session, setSession] = useState<any>(null);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('broker_assistant_theme') as 'light' | 'dark' | null;
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        setTheme(savedTheme);
+      } else {
+        // Default for new users: light
+        setTheme('light');
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('broker_assistant_theme', nextTheme);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -645,39 +668,91 @@ export default function Home() {
     );
   }
 
-  // --- Render Authenticated Dashboard (Dark Premium Aesthetic) ---
-  return (
-    <main className="min-h-screen bg-[#181818] text-[#e1e1e1] p-4 md:p-6 font-sans text-base">
-      <div className="max-w-7xl mx-auto w-full space-y-5">
+  // --- Render Authenticated Dashboard (Supports Light & Dark Themes) ---
+  const isDark = theme === 'dark';
 
-        {/* Top Header with User Info & Sign Out */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-1 gap-2">
+  return (
+    <main
+      className={`min-h-screen p-4 md:p-6 font-sans text-base transition-colors duration-200 relative ${
+        isDark ? 'bg-[#181818] text-[#e1e1e1]' : 'bg-[#fafafd] text-gray-900 overflow-x-hidden'
+      }`}
+    >
+      {/* Background blurs for Light theme matching public views */}
+      {!isDark && (
+        <>
+          <div className="absolute -top-32 -left-32 w-[550px] h-[550px] bg-[#dbeafe]/60 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-[#ffedd5]/70 rounded-full blur-[150px] pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-[#fce7f3]/60 rounded-full blur-[140px] pointer-events-none" />
+        </>
+      )}
+
+      <div className="max-w-7xl mx-auto w-full space-y-5 relative z-10">
+
+        {/* Top Header with User Info, Theme Switch & Sign Out */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-1 gap-3">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="Broker Assistant Logo" className="h-9 w-auto object-contain" />
             <div>
-              <h1 className="text-xl md:text-2xl font-semibold text-white tracking-tight">
+              <h1 className={`text-xl md:text-2xl font-semibold tracking-tight ${isDark ? 'text-white' : 'text-gray-950 font-pagani'}`}>
                 Broker Assistant
               </h1>
-              <p className="text-[#999999] text-[13px]">
+              <p className={`text-[13px] ${isDark ? 'text-[#999999]' : 'text-gray-500'}`}>
                 Search property owners, filter buildings, and deliver direct WhatsApp messages.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 bg-[#222222] border border-[#333333] px-3 py-1.5 rounded-xl text-xs">
-            <div className="flex flex-col text-right">
-              <span className="text-white font-medium truncate max-w-[220px]">{session.user.email}</span>
-              <span className="text-[#888888] text-[11px] flex items-center justify-end gap-1.5 mt-0.5">
-                Broker Account
-              </span>
-            </div>
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle Button (Light / Dark) */}
             <button
-              onClick={handleSignOut}
-              title="Sign Out"
-              className="p-1.5 text-[#888888] hover:text-red-400 hover:bg-[#2b2b2b] rounded-lg transition ml-1 cursor-pointer"
+              onClick={toggleTheme}
+              type="button"
+              title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border transition cursor-pointer shadow-sm ${
+                isDark
+                  ? 'bg-[#222222] border-[#333333] text-gray-300 hover:text-white hover:border-[#444444]'
+                  : 'bg-white/90 border-gray-200 text-gray-700 hover:text-black hover:border-gray-300'
+              }`}
             >
-              <LogOut className="w-4 h-4" />
+              {isDark ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400" />
+                  <span className="hidden sm:inline">Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-blue-600" />
+                  <span className="hidden sm:inline">Dark Mode</span>
+                </>
+              )}
             </button>
+
+            {/* User Account Pill */}
+            <div
+              className={`flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs border shadow-sm ${
+                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 border-gray-200 backdrop-blur-md'
+              }`}
+            >
+              <div className="flex flex-col text-right">
+                <span className={`font-medium truncate max-w-[200px] sm:max-w-[220px] ${isDark ? 'text-white' : 'text-gray-950'}`}>
+                  {session.user.email}
+                </span>
+                <span className={`text-[11px] flex items-center justify-end gap-1.5 mt-0.5 ${isDark ? 'text-[#888888]' : 'text-gray-500'}`}>
+                  Broker Account
+                </span>
+              </div>
+              <button
+                onClick={handleSignOut}
+                title="Sign Out"
+                className={`p-1.5 rounded-lg transition ml-1 cursor-pointer ${
+                  isDark
+                    ? 'text-[#888888] hover:text-red-400 hover:bg-[#2b2b2b]'
+                    : 'text-gray-400 hover:text-red-600 hover:bg-gray-100'
+                }`}
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </header>
 
@@ -687,34 +762,48 @@ export default function Home() {
           <div className="lg:col-span-1 space-y-5">
 
             {/* Combined Single Card: WhatsApp & Import */}
-            <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-4">
+            <div
+              className={`rounded-2xl p-5 space-y-4 border transition-colors ${
+                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 backdrop-blur-md border-gray-200/90 shadow-sm'
+              }`}
+            >
 
               {/* WhatsApp Section */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-white tracking-tight">WhatsApp Connection</h2>
+                  <h2 className={`text-lg font-semibold tracking-tight ${isDark ? 'text-white' : 'text-gray-950'}`}>
+                    WhatsApp Connection
+                  </h2>
                   {waStatus === 'connected' ? (
                     <span className="text-[11px] bg-[#89c900] text-black px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5 shadow-sm">
                       <span className="w-1.5 h-1.5 rounded-full bg-black" /> Connected
                     </span>
                   ) : waStatus === 'connecting' ? (
-                    <span className="text-[11px] bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1.5">
-                      <RefreshCw className="w-3 h-3 animate-spin text-amber-400" /> Scanning...
+                    <span className="text-[11px] bg-amber-500/10 text-amber-500 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1.5">
+                      <RefreshCw className="w-3 h-3 animate-spin text-amber-500" /> Scanning...
                     </span>
                   ) : (
-                    <span className="text-[11px] bg-[#2b2b2b] text-[#888888] border border-[#383838] px-2.5 py-0.5 rounded-full font-medium">
+                    <span
+                      className={`text-[11px] px-2.5 py-0.5 rounded-full font-medium border ${
+                        isDark ? 'bg-[#2b2b2b] text-[#888888] border-[#383838]' : 'bg-gray-100 text-gray-500 border-gray-200'
+                      }`}
+                    >
                       Not Connected
                     </span>
                   )}
                 </div>
 
-                <p className="text-[13px] text-[#999999] leading-snug">
+                <p className={`text-[13px] leading-snug ${isDark ? 'text-[#999999]' : 'text-gray-600'}`}>
                   Link your phone to send messages directly to property owners from your WhatsApp account.
                 </p>
 
                 {/* QR Code Display when Connecting */}
                 {waStatus === 'connecting' && waQrCode && (
-                  <div className="bg-[#181818] border border-[#3a3a3a] rounded-xl p-2.5 flex flex-col items-center space-y-1.5 text-center">
+                  <div
+                    className={`rounded-xl p-2.5 flex flex-col items-center space-y-1.5 text-center border ${
+                      isDark ? 'bg-[#181818] border-[#3a3a3a]' : 'bg-gray-50 border-gray-200'
+                    }`}
+                  >
                     <div className="bg-white p-2 rounded-lg shadow-inner">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -723,15 +812,15 @@ export default function Home() {
                         className="w-36 h-36 object-contain"
                       />
                     </div>
-                    <p className="text-xs text-[#888888]">
+                    <p className={`text-xs ${isDark ? 'text-[#888888]' : 'text-gray-500'}`}>
                       Scan with WhatsApp → Linked Devices
                     </p>
                   </div>
                 )}
 
                 {waError && (
-                  <div className="p-2 bg-red-950/40 border border-red-800/60 rounded-lg text-xs text-red-300 flex items-start gap-1.5">
-                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-red-400 mt-0.5" />
+                  <div className="p-2 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-500 flex items-start gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-red-500 mt-0.5" />
                     <span>{waError}</span>
                   </div>
                 )}
@@ -740,7 +829,11 @@ export default function Home() {
                   type="button"
                   onClick={handleConnectWhatsApp}
                   disabled={waLoading}
-                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  className={`w-full font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition cursor-pointer border ${
+                    isDark
+                      ? 'bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border-[#444444] text-white'
+                      : 'bg-gray-900 hover:bg-black text-white border-transparent shadow-sm'
+                  }`}
                 >
                   {waLoading ? (
                     <>
@@ -766,15 +859,23 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="border-t border-[#333333]" />
+              <div className={`border-t ${isDark ? 'border-[#333333]' : 'border-gray-200'}`} />
 
               {/* Import CSV Section */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-white tracking-tight">Import Property Listings</h2>
-                  <span className="text-[11px] bg-[#2b2b2b] text-[#888888] px-1.5 py-0.5 rounded font-mono">CSV</span>
+                  <h2 className={`text-lg font-semibold tracking-tight ${isDark ? 'text-white' : 'text-gray-950'}`}>
+                    Import Property Listings
+                  </h2>
+                  <span
+                    className={`text-[11px] px-1.5 py-0.5 rounded font-mono ${
+                      isDark ? 'bg-[#2b2b2b] text-[#888888]' : 'bg-gray-100 text-gray-500'
+                    }`}
+                  >
+                    CSV
+                  </span>
                 </div>
-                <p className="text-[13px] text-[#999999] leading-snug">
+                <p className={`text-[13px] leading-snug ${isDark ? 'text-[#999999]' : 'text-gray-600'}`}>
                   Upload your CSV spreadsheet to add or update your property and owner listings.
                 </p>
                 <input
@@ -787,7 +888,11 @@ export default function Home() {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="w-full bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border border-[#444444] text-white font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer"
+                  className={`w-full font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer border ${
+                    isDark
+                      ? 'bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border-[#444444] text-white'
+                      : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-300'
+                  }`}
                 >
                   {uploading ? (
                     <>
@@ -796,7 +901,7 @@ export default function Home() {
                     </>
                   ) : (
                     <>
-                      <FileText className="w-3.5 h-3.5 text-white" />
+                      <FileText className={`w-3.5 h-3.5 ${isDark ? 'text-white' : 'text-gray-700'}`} />
                       <span>Upload CSV File</span>
                     </>
                   )}
@@ -804,27 +909,32 @@ export default function Home() {
 
                 {importResult && (
                   <div
-                    className={`p-2 rounded-lg text-xs flex items-start gap-1.5 ${importResult.success
-                      ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
-                      : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
-                      }`}
+                    className={`p-2 rounded-lg text-xs flex items-start gap-1.5 ${
+                      importResult.success
+                        ? isDark
+                          ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
+                          : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                        : isDark
+                        ? 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
+                        : 'bg-red-50 border border-red-200 text-red-800'
+                    }`}
                   >
                     {importResult.success ? (
                       <>
-                        <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 text-emerald-400 mt-0.5" />
+                        <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 text-emerald-600 mt-0.5" />
                         <div>
-                          <p className="font-medium text-emerald-300">Properties Imported!</p>
-                          <p className="text-xs text-[#a3e635]">
+                          <p className="font-medium text-emerald-700">Properties Imported!</p>
+                          <p className="text-xs text-emerald-600">
                             {importResult.total_processed} record(s) added to portfolio.
                           </p>
                         </div>
                       </>
                     ) : (
                       <>
-                        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-red-400 mt-0.5" />
+                        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 text-red-500 mt-0.5" />
                         <div>
-                          <p className="font-medium text-red-300">Import Failed</p>
-                          <p className="text-xs text-red-200">{importResult.error}</p>
+                          <p className="font-medium text-red-700">Import Failed</p>
+                          <p className="text-xs text-red-600">{importResult.error}</p>
                         </div>
                       </>
                     )}
@@ -835,9 +945,15 @@ export default function Home() {
             </div>
 
             {/* Template Editor Card */}
-            <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 space-y-3">
-              <h2 className="text-lg font-semibold text-white tracking-tight">Message Template</h2>
-              <p className="text-[13px] text-[#999999]">
+            <div
+              className={`rounded-2xl p-5 space-y-3 border transition-colors ${
+                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 backdrop-blur-md border-gray-200/90 shadow-sm'
+              }`}
+            >
+              <h2 className={`text-lg font-semibold tracking-tight ${isDark ? 'text-white' : 'text-gray-950'}`}>
+                Message Template
+              </h2>
+              <p className={`text-[13px] ${isDark ? 'text-[#999999]' : 'text-gray-600'}`}>
                 Click tags to insert details automatically:
               </p>
               {/* Message Template Tags */}
@@ -852,7 +968,7 @@ export default function Home() {
                     key={item.tag}
                     type="button"
                     onClick={() => insertTag(item.tag)}
-                    className="bg-[#89c900]/10 hover:bg-[#89c900]/20 text-[#d8e454] text-xs px-2.5 py-1 rounded border border-[#89c900]/30 transition cursor-pointer font-medium"
+                    className="bg-[#89c900]/15 hover:bg-[#89c900]/25 text-gray-950 text-xs px-2.5 py-1 rounded-lg border border-[#89c900]/40 transition cursor-pointer font-medium"
                   >
                     {item.label}
                   </button>
@@ -862,7 +978,11 @@ export default function Home() {
                 rows={4}
                 value={template}
                 onChange={e => setTemplate(e.target.value)}
-                className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg p-3 text-[13px] text-white focus:outline-none focus:border-[#89c900] leading-relaxed resize-y"
+                className={`w-full rounded-xl p-3 text-[13px] border focus:outline-none focus:border-[#89c900] leading-relaxed resize-y ${
+                  isDark
+                    ? 'bg-[#181818] border-[#3a3a3a] text-white'
+                    : 'bg-gray-50 border-gray-200 text-gray-900'
+                }`}
               />
 
               {/* Send Button */}
@@ -870,7 +990,7 @@ export default function Home() {
                 type="button"
                 onClick={handleDispatch}
                 disabled={sending || selectedIds.size === 0}
-                className="w-full bg-[#89c900] text-gray-950 font-bold py-3 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-md disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-[#7bb700] enabled:active:bg-[#6fa500] enabled:cursor-pointer"
+                className="w-full bg-[#89c900] text-gray-950 font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-[#7bb700] enabled:active:bg-[#6fa500] enabled:cursor-pointer"
               >
                 {sending ? <RefreshCw className="w-4 h-4 animate-spin text-gray-950" /> : <Send className="w-4 h-4 text-gray-950" />}
                 <span>
@@ -882,18 +1002,23 @@ export default function Home() {
 
               {dispatchResult && (
                 <div
-                  className={`p-3 rounded-lg text-xs ${dispatchResult.success
-                    ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
-                    : 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
-                    }`}
+                  className={`p-3 rounded-xl text-xs border ${
+                    dispatchResult.success
+                      ? isDark
+                        ? 'bg-[#1b2a1e] border-[#2e5235] text-[#7ce090]'
+                        : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                      : isDark
+                      ? 'bg-[#2d1b1b] border-[#542828] text-[#f87171]'
+                      : 'bg-red-50 border-red-200 text-red-900'
+                  }`}
                 >
                   {dispatchResult.success ? (
                     <div className="space-y-1">
-                      <p className="font-semibold flex items-center gap-1.5 text-emerald-300">
+                      <p className="font-semibold flex items-center gap-1.5 text-emerald-600">
                         <CheckCircle className="w-4 h-4" /> Messages successfully sent!
                       </p>
                       <p>Total: {dispatchResult.total_sent} messages queued for delivery.</p>
-                      <p className="text-[#888888] italic truncate">Sample: &quot;{dispatchResult.sample_message}&quot;</p>
+                      <p className="italic truncate opacity-80">Sample: &quot;{dispatchResult.sample_message}&quot;</p>
                     </div>
                   ) : (
                     <p>Error sending messages: {dispatchResult.error}</p>
@@ -908,20 +1033,31 @@ export default function Home() {
           <div className="lg:col-span-2 space-y-5">
 
             {/* Inline Search Bar */}
-            <form onSubmit={handleSearch} className="bg-[#222222] border border-[#333333] rounded-xl p-3 flex flex-col sm:flex-row items-center gap-3">
+            <form
+              onSubmit={handleSearch}
+              className={`rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-3 border transition-colors ${
+                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 backdrop-blur-md border-gray-200/90 shadow-sm'
+              }`}
+            >
               <div className="relative flex-1 w-full">
                 <input
                   type="text"
                   placeholder="Search by building, owner, unit, phone..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-4 py-2.5 text-sm text-white placeholder-[#666666] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className={`w-full rounded-xl px-4 py-2.5 text-sm border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+                    isDark
+                      ? 'bg-[#181818] border-[#3a3a3a] text-white placeholder-[#666666]'
+                      : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+                  }`}
                 />
                 {searchTerm && (
                   <button
                     type="button"
                     onClick={() => setSearchTerm('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#888888] hover:text-white cursor-pointer"
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer ${
+                      isDark ? 'text-[#888888] hover:text-white' : 'text-gray-400 hover:text-gray-700'
+                    }`}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -933,7 +1069,11 @@ export default function Home() {
                 <select
                   value={selectedBuilding}
                   onChange={e => setSelectedBuilding(e.target.value)}
-                  className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 text-ellipsis cursor-pointer"
+                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm border focus:outline-none focus:border-blue-500 text-ellipsis cursor-pointer ${
+                    isDark
+                      ? 'bg-[#181818] border-[#3a3a3a] text-white'
+                      : 'bg-gray-50 border-gray-200 text-gray-900'
+                  }`}
                 >
                   <option value="">
                     {buildingsLoading ? 'Loading buildings...' : `All Buildings (${buildings.length.toLocaleString()})`}
@@ -951,21 +1091,38 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setIsRoomsOpen(!isRoomsOpen)}
-                  className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-3.5 py-2.5 text-sm text-white flex justify-between items-center focus:outline-none focus:border-blue-500 cursor-pointer"
+                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border focus:outline-none focus:border-blue-500 cursor-pointer ${
+                    isDark
+                      ? 'bg-[#181818] border-[#3a3a3a] text-white'
+                      : 'bg-gray-50 border-gray-200 text-gray-900'
+                  }`}
                 >
                   <span className="truncate">
                     {roomsLoading ? 'Loading...' : selectedRooms.length === 0 ? 'All Types' : `${selectedRooms.length} Types Selected`}
                   </span>
                 </button>
                 {isRoomsOpen && (
-                  <div className="absolute top-full left-0 mt-1 w-full bg-[#181818] border border-[#3a3a3a] rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
+                  <div
+                    className={`absolute top-full left-0 mt-1 w-full rounded-xl border shadow-xl z-50 max-h-60 overflow-y-auto ${
+                      isDark ? 'bg-[#181818] border-[#3a3a3a]' : 'bg-white border-gray-200'
+                    }`}
+                  >
                     {roomsLoading ? (
-                      <div className="px-3 py-3 text-sm text-[#888888] text-center">Loading types...</div>
+                      <div className={`px-3 py-3 text-sm text-center ${isDark ? 'text-[#888888]' : 'text-gray-400'}`}>
+                        Loading types...
+                      </div>
                     ) : roomsOptions.length === 0 ? (
-                      <div className="px-3 py-3 text-sm text-[#888888] text-center">No types found</div>
+                      <div className={`px-3 py-3 text-sm text-center ${isDark ? 'text-[#888888]' : 'text-gray-400'}`}>
+                        No types found
+                      </div>
                     ) : (
                       roomsOptions.map(room => (
-                        <label key={room} className="flex items-center gap-2 px-3 py-2 hover:bg-[#2d2d2d] cursor-pointer text-sm text-white">
+                        <label
+                          key={room}
+                          className={`flex items-center gap-2 px-3 py-2 cursor-pointer text-sm transition ${
+                            isDark ? 'hover:bg-[#2d2d2d] text-white' : 'hover:bg-gray-50 text-gray-900'
+                          }`}
+                        >
                           <input
                             type="checkbox"
                             checked={selectedRooms.includes(room)}
@@ -976,7 +1133,7 @@ export default function Home() {
                                 setSelectedRooms(selectedRooms.filter(r => r !== room));
                               }
                             }}
-                            className="rounded border-[#3a3a3a] bg-[#222222] text-blue-500 focus:ring-blue-500"
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                           />
                           {room}
                         </label>
@@ -991,7 +1148,7 @@ export default function Home() {
                 type="submit"
                 disabled={loading}
                 title="Search Properties"
-                className="bg-[#89c900] hover:bg-[#7bb700] active:bg-[#6fa500] disabled:opacity-50 text-gray-950 font-bold p-2.5 rounded-lg flex items-center justify-center transition shadow-md flex-shrink-0 w-full sm:w-11 h-10 cursor-pointer"
+                className="bg-[#89c900] hover:bg-[#7bb700] active:bg-[#6fa500] disabled:opacity-50 text-gray-950 font-bold p-2.5 rounded-xl flex items-center justify-center transition shadow-md flex-shrink-0 w-full sm:w-11 h-10 cursor-pointer"
               >
                 {loading ? <RefreshCw className="w-5 h-5 animate-spin text-gray-950" /> : <Search className="w-5 h-5 text-gray-950" />}
               </button>
@@ -1002,7 +1159,9 @@ export default function Home() {
                   type="button"
                   onClick={handleClearFilters}
                   title="Clear all filters"
-                  className="text-[#888888] hover:text-white hover:bg-[#2d2d2d] p-2.5 rounded-lg transition flex items-center justify-center flex-shrink-0 w-full sm:w-10 h-10 cursor-pointer"
+                  className={`p-2.5 rounded-xl transition flex items-center justify-center flex-shrink-0 w-full sm:w-10 h-10 cursor-pointer ${
+                    isDark ? 'text-[#888888] hover:text-white hover:bg-[#2d2d2d]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1010,17 +1169,29 @@ export default function Home() {
             </form>
 
             {/* Results & Checkbox Table Card */}
-            <div className="bg-[#222222] border border-[#333333] rounded-xl p-5 flex flex-col min-h-[520px] space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#2d2d2d] pb-4 gap-2">
+            <div
+              className={`rounded-2xl p-5 flex flex-col min-h-[520px] space-y-4 border transition-colors ${
+                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 backdrop-blur-md border-gray-200/90 shadow-sm'
+              }`}
+            >
+              <div
+                className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-2 ${
+                  isDark ? 'border-[#2d2d2d]' : 'border-gray-200'
+                }`}
+              >
                 <div className="flex items-center gap-3">
-                  <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <h2 className={`text-lg font-semibold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-950'}`}>
                     <span>Properties Found</span>
-                    <span className="text-xs bg-[#89c900]/15 text-[#d8e454] border border-[#89c900]/30 px-2.5 py-0.5 rounded-full font-mono font-medium">
+                    <span className="text-xs bg-[#89c900]/15 text-gray-950 border border-[#89c900]/40 px-2.5 py-0.5 rounded-full font-mono font-medium">
                       {results.length.toLocaleString()}
                     </span>
                   </h2>
                   {results.length > 0 && (
-                    <span className="text-xs bg-white text-gray-950 px-2.5 py-0.5 rounded font-mono font-bold shadow-sm">
+                    <span
+                      className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-bold shadow-sm ${
+                        isDark ? 'bg-white text-gray-950' : 'bg-gray-950 text-white'
+                      }`}
+                    >
                       {selectedIds.size} of {results.length} selected
                     </span>
                   )}
@@ -1031,14 +1202,20 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={toggleSelectAll}
-                      className="text-xs bg-[#2d2d2d] hover:bg-[#383838] border border-[#444444] px-2.5 py-1 rounded text-[#cccccc] hover:text-white transition cursor-pointer"
+                      className={`text-xs px-3 py-1.5 rounded-lg border transition cursor-pointer font-medium ${
+                        isDark
+                          ? 'bg-[#2d2d2d] hover:bg-[#383838] border-[#444444] text-[#cccccc] hover:text-white'
+                          : 'bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-800'
+                      }`}
                     >
                       {isAllSelected ? 'Deselect All' : 'Select All'}
                     </button>
                     <button
                       type="button"
                       onClick={handleClearFilters}
-                      className="text-xs text-[#888888] hover:text-white transition ml-2 cursor-pointer"
+                      className={`text-xs transition ml-2 cursor-pointer font-medium ${
+                        isDark ? 'text-[#888888] hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                      }`}
                     >
                       Clear results
                     </button>
@@ -1047,26 +1224,34 @@ export default function Home() {
               </div>
 
               {loading ? (
-                <div className="flex-1 flex flex-col items-center justify-center py-20 text-[#888888] space-y-3">
-                  <RefreshCw className="w-8 h-8 animate-spin text-blue-400" />
+                <div className={`flex-1 flex flex-col items-center justify-center py-20 space-y-3 ${isDark ? 'text-[#888888]' : 'text-gray-400'}`}>
+                  <RefreshCw className="w-8 h-8 animate-spin text-blue-500" />
                   <p className="text-sm">Loading properties...</p>
                 </div>
               ) : results.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center py-20 text-[#777777] space-y-3">
-                  <Search className="w-12 h-12 stroke-[1.5] text-[#444444]" />
-                  <p className="text-base text-[#aaaaaa]">
+                <div className={`flex-1 flex flex-col items-center justify-center py-20 space-y-3 ${isDark ? 'text-[#777777]' : 'text-gray-400'}`}>
+                  <Search className={`w-12 h-12 stroke-[1.5] ${isDark ? 'text-[#444444]' : 'text-gray-300'}`} />
+                  <p className={`text-base font-medium ${isDark ? 'text-[#aaaaaa]' : 'text-gray-700'}`}>
                     {hasSearched
                       ? 'No properties found matching your search.'
                       : 'Search by keyword (e.g. building name, property type/Studio, owner, phone) or select a building above.'}
                   </p>
-                  <p className="text-xs text-[#666666] max-w-sm text-center">
+                  <p className={`text-xs max-w-sm text-center ${isDark ? 'text-[#666666]' : 'text-gray-500'}`}>
                     Tip: Select properties using the checkboxes to send them a personalized message.
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto flex-1 max-h-[650px] overflow-y-auto rounded-lg border border-[#2d2d2d]">
+                <div
+                  className={`overflow-x-auto flex-1 max-h-[650px] overflow-y-auto rounded-xl border ${
+                    isDark ? 'border-[#2d2d2d]' : 'border-gray-200'
+                  }`}
+                >
                   <table className="w-full text-left border-collapse text-sm">
-                    <thead className="sticky top-0 bg-[#1a1a1a] text-[#aaaaaa] border-b border-[#2d2d2d] z-10 shadow-sm">
+                    <thead
+                      className={`sticky top-0 z-10 shadow-sm border-b font-medium ${
+                        isDark ? 'bg-[#1a1a1a] text-[#aaaaaa] border-[#2d2d2d]' : 'bg-gray-50 text-gray-600 border-gray-200'
+                      }`}
+                    >
                       <tr>
                         <th className="py-3 px-3 w-10 text-center">
                           <input
@@ -1076,18 +1261,22 @@ export default function Home() {
                               if (input) input.indeterminate = isPartiallySelected;
                             }}
                             onChange={toggleSelectAll}
-                            className="w-4 h-4 rounded border-[#444444] bg-[#222222] text-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-0 cursor-pointer"
                           />
                         </th>
-                        <th className="py-3 px-4 font-medium">Owner Name</th>
-                        <th className="py-3 px-4 font-medium">Phone Number</th>
-                        <th className="py-3 px-4 font-medium">Building</th>
-                        <th className="py-3 px-4 font-medium">Unit</th>
-                        <th className="py-3 px-4 font-medium">Rooms</th>
-                        <th className="py-3 px-4 font-medium">Message Preview</th>
+                        <th className="py-3 px-4">Owner Name</th>
+                        <th className="py-3 px-4">Phone Number</th>
+                        <th className="py-3 px-4">Building</th>
+                        <th className="py-3 px-4">Unit</th>
+                        <th className="py-3 px-4">Rooms</th>
+                        <th className="py-3 px-4">Message Preview</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#2a2a2a] bg-[#1f1f1f]">
+                    <tbody
+                      className={`divide-y ${
+                        isDark ? 'divide-[#2a2a2a] bg-[#1f1f1f]' : 'divide-gray-100 bg-white'
+                      }`}
+                    >
                       {results.map((row: any) => {
                         const isSelected = selectedIds.has(row.id);
                         const msg = template
@@ -1102,21 +1291,32 @@ export default function Home() {
                           <tr
                             key={row.id}
                             onClick={() => toggleSelectRow(row.id)}
-                            className={`transition cursor-pointer group ${isSelected ? 'bg-[#1e293b]/50 hover:bg-[#1e293b]/70' : 'hover:bg-[#282828]'
-                              }`}
+                            className={`transition cursor-pointer group ${
+                              isSelected
+                                ? isDark
+                                  ? 'bg-[#1e293b]/50 hover:bg-[#1e293b]/70'
+                                  : 'bg-blue-50/80 hover:bg-blue-100/80'
+                                : isDark
+                                ? 'hover:bg-[#282828]'
+                                : 'hover:bg-gray-50/80'
+                            }`}
                           >
                             <td className="py-3 px-3 text-center" onClick={e => e.stopPropagation()}>
                               <input
                                 type="checkbox"
                                 checked={isSelected}
                                 onChange={() => toggleSelectRow(row.id)}
-                                className="w-4 h-4 rounded border-[#444444] bg-[#222222] text-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-0 cursor-pointer"
                               />
                             </td>
-                            <td className="py-3 px-4 font-medium text-white whitespace-nowrap">
-                              {row.owner_name || <span className="text-[#666666] italic">Unknown</span>}
+                            <td
+                              className={`py-3 px-4 font-medium whitespace-nowrap ${
+                                isDark ? 'text-white' : 'text-gray-950'
+                              }`}
+                            >
+                              {row.owner_name || <span className="opacity-40 italic">Unknown</span>}
                             </td>
-                            <td className="py-3 px-4 font-mono text-blue-400 whitespace-nowrap">
+                            <td className="py-3 px-4 font-mono text-blue-600 whitespace-nowrap">
                               <div className="flex items-center gap-1.5">
                                 <span>{row.phone}</span>
                                 <button
@@ -1126,29 +1326,41 @@ export default function Home() {
                                     copyToClipboard(row.phone);
                                   }}
                                   title="Copy phone number"
-                                  className="opacity-0 group-hover:opacity-100 text-[#888888] hover:text-white transition p-1 cursor-pointer"
+                                  className={`opacity-0 group-hover:opacity-100 transition p-1 cursor-pointer ${
+                                    isDark ? 'text-[#888888] hover:text-white' : 'text-gray-400 hover:text-gray-800'
+                                  }`}
                                 >
                                   {copiedPhone === row.phone ? (
-                                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                    <Check className="w-3.5 h-3.5 text-emerald-600" />
                                   ) : (
                                     <Copy className="w-3.5 h-3.5" />
                                   )}
                                 </button>
                               </div>
                             </td>
-                            <td className="py-3 px-4 text-[#cccccc] whitespace-nowrap">
+                            <td className={`py-3 px-4 whitespace-nowrap ${isDark ? 'text-[#cccccc]' : 'text-gray-700'}`}>
                               {row.building_name || '-'}
                             </td>
-                            <td className="py-3 px-4 text-[#cccccc] whitespace-nowrap">
-                              <span className="bg-[#2a2a2a] px-2 py-0.5 rounded text-xs">
+                            <td className={`py-3 px-4 whitespace-nowrap ${isDark ? 'text-[#cccccc]' : 'text-gray-700'}`}>
+                              <span
+                                className={`px-2 py-0.5 rounded text-xs border ${
+                                  isDark ? 'bg-[#2a2a2a] border-transparent' : 'bg-gray-100 border-gray-200'
+                                }`}
+                              >
                                 {row.unit_number || '-'}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-[#888888] whitespace-nowrap">
+                            <td className={`py-3 px-4 whitespace-nowrap ${isDark ? 'text-[#888888]' : 'text-gray-500'}`}>
                               {row.rooms || '-'}
                             </td>
-                            <td className="py-3 px-4 text-[#aaaaaa] max-w-xs truncate" title={msg}>
-                              <span className="text-xs bg-[#181818] border border-[#2e2e2e] px-2.5 py-1 rounded block truncate">
+                            <td className={`py-3 px-4 max-w-xs truncate ${isDark ? 'text-[#aaaaaa]' : 'text-gray-600'}`} title={msg}>
+                              <span
+                                className={`text-xs px-2.5 py-1 rounded-lg block truncate border ${
+                                  isDark
+                                    ? 'bg-[#181818] border-[#2e2e2e]'
+                                    : 'bg-gray-50 border-gray-200 text-gray-700'
+                                }`}
+                              >
                                 {msg}
                               </span>
                             </td>
