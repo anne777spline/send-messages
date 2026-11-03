@@ -50,7 +50,7 @@ export default function FeaturesPage() {
             </div>
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200/80 font-mono text-xs text-gray-600 flex items-center justify-between">
               <span>Any spreadsheet layout &bull; Any country</span>
-              <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-md">AI Auto-Mapped</span>
+              <span className="bg-gray-900 text-white font-bold px-3 py-1 rounded-full text-[10px]">AI Auto-Mapped</span>
             </div>
           </div>
 

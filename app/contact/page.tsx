@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Mail, Globe, MapPin, CheckCircle2, Send, Headset, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Globe, CheckCircle2, Send, Loader2, AlertCircle } from 'lucide-react';
 
 export default function ContactPage() {
   const [name, setName] = useState('');
@@ -69,34 +69,74 @@ export default function ContactPage() {
       {/* Persistent Navbar */}
       <Navbar />
 
-      {/* Page Content Container */}
-      <div className="w-full max-w-7xl mx-auto px-6 pt-10 md:pt-16 pb-12 relative z-10 flex-1 my-auto space-y-10 md:space-y-12">
-        {/* Page Hero Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end">
-          <div className="lg:col-span-7">
-            <h1 className="font-pagani text-4xl sm:text-5xl lg:text-6xl font-light text-gray-950 leading-[1.1] tracking-tight">
+      {/* Page Content Container matching Hero 2-column layout */}
+      <div className="w-full max-w-7xl mx-auto px-6 py-8 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start lg:items-center relative z-10 flex-1 my-auto">
+        
+        {/* Left Column: Titles, Descriptions & Discrete Contact Info */}
+        <div className="lg:col-span-6 space-y-6 md:space-y-8">
+          <div className="space-y-3">
+            <h1 className="font-pagani text-4xl sm:text-5xl lg:text-6xl font-light text-gray-950 leading-[1.12] tracking-tight">
               Get in Touch <br />
               <span className="font-serif-accent italic font-normal text-gray-950 text-[1.08em]">With Our Team</span> <br />
               <span className="font-normal text-gray-900">Six Tenet LLC</span>
             </h1>
           </div>
-          <div className="lg:col-span-5 pb-1">
-            <p className="text-base sm:text-lg text-gray-600 leading-relaxed font-normal border-l-2 border-gray-950/20 pl-5">
-              Have questions about Broker Assistant, bulk plans for your brokerage, or custom enterprise setups? We are here to help your team close deals faster.
-            </p>
+
+          <p className="text-base sm:text-lg text-gray-600 max-w-xl font-normal leading-relaxed">
+            Have questions about Broker Assistant, bulk plans for your brokerage, or custom enterprise setups? We are here to help your team close deals faster.
+          </p>
+
+          {/* Discrete Contact Details */}
+          <div className="pt-4 border-t border-gray-200/80 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Direct Inquiries</p>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-gray-700">
+              <a
+                href="mailto:info@sixtenet.com"
+                className="inline-flex items-center gap-2.5 hover:text-black transition group"
+              >
+                <div className="w-8 h-8 rounded-xl bg-white shadow-sm border border-gray-200/80 flex items-center justify-center text-gray-700 group-hover:text-black group-hover:border-gray-300 transition">
+                  <Mail className="w-3.5 h-3.5" />
+                </div>
+                <span className="font-medium">info@sixtenet.com</span>
+              </a>
+
+              <a
+                href="https://sixtenet.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 hover:text-black transition group"
+              >
+                <div className="w-8 h-8 rounded-xl bg-white shadow-sm border border-gray-200/80 flex items-center justify-center text-gray-700 group-hover:text-black group-hover:border-gray-300 transition">
+                  <Globe className="w-3.5 h-3.5" />
+                </div>
+                <span className="font-medium">sixtenet.com</span>
+              </a>
+
+              <span className="text-xs text-gray-500 pl-2 border-l border-gray-200">
+                Replies within 24 business hours
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Content Section: 2 Columns (Contact Form + Direct Info Cards Swapped) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Contact Message Box */}
-          <div className="lg:col-span-7 bg-white/90 backdrop-blur-md border border-gray-200/90 rounded-3xl p-8 sm:p-10 shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-950 tracking-tight mb-2">Send us a direct message</h2>
-            <p className="text-sm text-gray-600 mb-6">
-              Write your inquiry below and we will get back to you within 24 business hours at your email.
-            </p>
+        {/* Right Column: Contact Message Form with Organic Branding Blobs behind */}
+        <div className="lg:col-span-6 w-full max-w-xl mx-auto lg:ml-auto relative flex justify-center items-center py-2 sm:py-4">
+          {/* Top-Right Green Blob #89c900 */}
+          <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5 w-60 h-60 sm:w-72 sm:h-72 bg-[#89c900] rounded-[60px] transform rotate-12 opacity-95 shadow-lg pointer-events-none transition-transform duration-700 hover:scale-105 z-0" />
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Bottom-Left Lime/Yellow Blob #d8e454 */}
+          <div className="absolute -bottom-3 -left-3 sm:-bottom-5 sm:-left-5 w-60 h-60 sm:w-72 sm:h-72 bg-[#d8e454] rounded-[60px] transform -rotate-12 opacity-95 shadow-lg pointer-events-none transition-transform duration-700 hover:scale-105 z-0" />
+
+          {/* Contact Message Form Container */}
+          <div className="w-full bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-[32px] p-7 sm:p-9 shadow-2xl relative z-10">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-950 tracking-tight">Send us a direct message</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Write your inquiry below and we will get back to you within 24 business hours.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Honeypot anti-spam (hidden from users, targeted by bots) */}
               <div className="hidden" aria-hidden="true">
                 <label htmlFor="website-field">Website</label>
@@ -153,7 +193,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto bg-gray-900 hover:bg-black disabled:bg-gray-400 text-white font-medium px-8 py-4 rounded-full text-sm flex items-center justify-center gap-2 transition shadow-md hover:shadow-lg cursor-pointer disabled:cursor-not-allowed"
+                className="w-full sm:w-auto bg-gray-900 hover:bg-black disabled:bg-gray-400 text-white font-medium px-8 py-3.5 rounded-full text-sm flex items-center justify-center gap-2 transition shadow-md hover:shadow-lg cursor-pointer disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -182,76 +222,6 @@ export default function ContactPage() {
                 </div>
               )}
             </form>
-          </div>
-
-          {/* Right Column: Direct Contact & Info Cards (Styled with Landing Branding) */}
-          <div className="lg:col-span-5 relative flex justify-center items-center py-4 sm:py-6">
-            {/* Green Organic Blob #89c900 */}
-            <div className="absolute -top-4 -right-2 sm:right-2 w-64 h-64 sm:w-72 sm:h-72 bg-[#89c900] rounded-[60px] transform rotate-12 opacity-95 shadow-lg pointer-events-none transition-transform duration-700 hover:scale-105" />
-
-            {/* Yellow Organic Blob #d8e454 */}
-            <div className="absolute -bottom-4 -left-2 sm:left-2 w-64 h-64 sm:w-72 sm:h-72 bg-[#d8e454] rounded-[60px] transform -rotate-12 opacity-95 shadow-lg pointer-events-none transition-transform duration-700 hover:scale-105" />
-
-            {/* Black Card (#000000) Overlapping Shapes */}
-            <div className="w-full max-w-[400px] bg-black text-white rounded-[36px] p-6 sm:p-7 shadow-2xl relative z-10 border border-gray-800 space-y-6">
-              {/* Header */}
-              <div className="flex items-center gap-3.5 border-b border-gray-800 pb-4">
-                <div className="w-11 h-11 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold shadow-md shrink-0">
-                  <Headset className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-white tracking-tight">Broker Assistant</h2>
-                  <p className="text-[11px] text-gray-400">Official Product Support by Six Tenet LLC</p>
-                </div>
-              </div>
-
-              {/* Direct Channels */}
-              <div className="space-y-3">
-                <p className="text-[11px] text-gray-400 font-medium tracking-wide uppercase">Direct Channels</p>
-
-                {/* Email White Card */}
-                <a
-                  href="mailto:info@sixtenet.com"
-                  className="bg-white text-gray-900 rounded-2xl p-3.5 shadow-xl flex items-center justify-between gap-3 group transition-transform hover:-translate-y-0.5 cursor-pointer block"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
-                      <Mail className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Direct Email</p>
-                      <p className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-blue-600 transition truncate">info@sixtenet.com</p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded-full shrink-0">24h reply</span>
-                </a>
-
-                {/* Website White Card */}
-                <a
-                  href="https://sixtenet.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white text-gray-900 rounded-2xl p-3.5 shadow-xl flex items-center justify-between gap-3 group transition-transform hover:-translate-y-0.5 cursor-pointer block"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-[#89c900]/15 text-gray-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
-                      <Globe className="w-4 h-4 text-[#89c900]" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Company Website</p>
-                      <p className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-[#89c900] transition truncate">sixtenet.com</p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] bg-[#89c900]/15 text-gray-900 font-semibold px-2 py-0.5 rounded-full shrink-0">Official</span>
-                </a>
-              </div>
-
-              {/* Security & Data note badge */}
-              <div className="p-3 bg-gray-900/90 border border-gray-800 rounded-2xl flex items-center justify-between text-xs text-gray-300">
-                <span className="text-[11px] text-gray-400">Response time</span>
-                <span className="text-[11px] font-semibold text-white">&lt; 24 business hours</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -67,7 +67,7 @@ export default function AboutPage() {
             </div>
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200/80 text-xs text-gray-700 font-medium flex items-center justify-between">
               <span>Works with spreadsheets from any country</span>
-              <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-md">AI Powered</span>
+              <span className="bg-gray-900 text-white font-bold px-3 py-1 rounded-full text-[10px]">AI Powered</span>
             </div>
           </div>
 
@@ -83,7 +83,7 @@ export default function AboutPage() {
             </div>
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200/80 text-xs text-gray-700 font-medium flex items-center justify-between">
               <span>100% isolated workspace per broker</span>
-              <span className="bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold px-2.5 py-1 rounded-md">Private Vault</span>
+              <span className="bg-gray-900 text-white font-bold px-3 py-1 rounded-full text-[10px]">Private Vault</span>
             </div>
           </div>
 
