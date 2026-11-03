@@ -1,8 +1,12 @@
 const { createClient } = require('@supabase/supabase-js');
 
-// These should be set in the environment where the script runs (e.g. GitHub Secrets)
+// 1. URL and Key configuration
+// Priority: Environment variables (GitHub Secrets) -> Safe fallback to public project anon credentials
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zajprlwljejzxsklkqzu.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SUPABASE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphanBybHdsamVqenhza2xrcXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMTU0NDQsImV4cCI6MjEwNTU5MTQ0NH0.Ju18CszM5qzAMHLCiUWv4izWYbtQJRjVHGoMZRVjGDI';
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('Error: Supabase URL and Key are required.');
@@ -12,20 +16,31 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function keepAlive() {
-  console.log(`[${new Date().toISOString()}] Ping to Supabase to prevent pause...`);
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] Initiating keep-alive ping to Supabase (${SUPABASE_URL})...`);
+
   try {
-    const { data, error } = await supabase.from('landlords').select('id').limit(1);
-    
+    // Ping the 'properties' table (which exists in the database)
+    const { data, error } = await supabase.from('properties').select('id').limit(1);
+
     if (error) {
-      console.error('Error pinging Supabase:', error);
-      process.exit(1);
+      console.warn(`Query on 'properties' returned: ${error.message}. Trying 'tenants' table fallback...`);
+      const fallback = await supabase.from('tenants').select('id').limit(1);
+      if (fallback.error) {
+        console.error('Both primary and fallback queries failed:', fallback.error);
+        process.exitCode = 1;
+        return;
+      }
+      console.log('Success! Fallback query on tenants succeeded. Supabase project is active.');
+      process.exitCode = 0;
+      return;
     }
-    
-    console.log('Success! Supabase project is active.');
-    process.exit(0);
+
+    console.log(`Success! Pinged 'properties' table. Rows found: ${data ? data.length : 0}. Supabase project is active.`);
+    process.exitCode = 0;
   } catch (err) {
-    console.error('Unexpected error:', err);
-    process.exit(1);
+    console.error('Unexpected error while keeping Supabase awake:', err);
+    process.exitCode = 1;
   }
 }
 
