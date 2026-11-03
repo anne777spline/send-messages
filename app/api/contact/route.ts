@@ -46,9 +46,8 @@ export async function POST(request: Request) {
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const toEmail = process.env.CONTACT_RECIPIENT_EMAIL || "info@sixtenet.com";
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "anneris.alonso@gmail.com";
-    const fromEmail = process.env.CONTACT_EMAIL_FROM || "Six Tenet <onboarding@resend.dev>";
+    const toEmail = process.env.CONTACT_RECIPIENT_EMAIL || "anneris.alonso@gmail.com";
+    const fromEmail = process.env.CONTACT_EMAIL_FROM || "Broker Assistant <info@sixtenet.com>";
 
     const htmlContent = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
@@ -68,31 +67,13 @@ export async function POST(request: Request) {
       </div>
     `;
 
-    // Intentar envío inicial al email configurado
-    let { data: resendData, error: resendError } = await resend.emails.send({
+    const { data: resendData, error: resendError } = await resend.emails.send({
       from: fromEmail,
       to: [toEmail],
       replyTo: data.email.trim().toLowerCase(),
       subject: `New Contact Request from ${data.name} (Broker Assistant)`,
       html: htmlContent,
     });
-
-    // Fallback: Si Resend rechaza porque el remitente de pruebas (onboarding@resend.dev)
-    // solo permite enviar al correo de la cuenta (adminEmail), reenviar automáticamente al correo verificado.
-    if (resendError && (resendError.message?.toLowerCase().includes("testing emails") || resendError.statusCode === 403)) {
-      if (toEmail.toLowerCase() !== adminEmail.toLowerCase()) {
-        console.warn(`[Contact API] Dominio no verificado en Resend aún. Reintentando al correo de la cuenta (${adminEmail})...`);
-        const fallbackRes = await resend.emails.send({
-          from: fromEmail,
-          to: [adminEmail],
-          replyTo: data.email.trim().toLowerCase(),
-          subject: `[Nuevo Contacto Web] ${data.name}`,
-          html: htmlContent,
-        });
-        resendData = fallbackRes.data;
-        resendError = fallbackRes.error;
-      }
-    }
 
     if (resendError) {
       console.error("[Contact API] Resend Error:", JSON.stringify(resendError));
