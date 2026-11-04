@@ -41,28 +41,27 @@ function formatRoomLabel(val: string): string {
   const trimmed = String(val).trim();
   const lower = trimmed.toLowerCase();
 
-  // If already contains words like bed, br, studio, room, penthouse, etc.
+  // If already contains descriptive words
   if (
-    lower.includes('bed') ||
-    lower.includes('br') ||
-    lower.includes('studio') ||
     lower.includes('room') ||
-    lower.includes('penthouse') ||
-    lower.includes('duplex') ||
-    lower.includes('villa')
+    lower.includes('bed') ||
+    lower.includes('studio') ||
+    lower.includes('office') ||
+    lower.includes('unit') ||
+    lower.includes('retail') ||
+    lower.includes('floor')
   ) {
     return trimmed;
   }
 
-  // If it's a pure number like "1", "2", "3", etc.
+  // If it's a pure number like "1", "2", "3", "45", etc.
   const num = parseInt(trimmed, 10);
   if (!isNaN(num) && String(num) === trimmed) {
     if (num === 0) return 'Studio';
-    if (num === 1) return '1 Bedroom';
-    return `${num} Bedrooms`;
+    if (num === 1) return '1 Room';
+    return `${num} Rooms`;
   }
 
-  // If decimal like "1.5" or other
   return `${trimmed} Rooms`;
 }
 
@@ -722,9 +721,8 @@ export default function Home() {
 
   return (
     <main
-      className={`min-h-screen p-4 md:p-6 font-sans text-base transition-colors duration-200 relative ${
-        isDark ? 'bg-[#181818] text-[#e1e1e1]' : 'bg-[#fafafd] text-gray-900 overflow-x-hidden'
-      }`}
+      className={`min-h-screen p-4 md:p-6 font-sans text-base transition-colors duration-200 relative ${isDark ? 'bg-[#181818] text-[#e1e1e1]' : 'bg-[#fafafd] text-gray-900 overflow-x-hidden'
+        }`}
     >
       {/* Background blurs for Light theme matching public views */}
       {!isDark && (
@@ -735,7 +733,7 @@ export default function Home() {
         </>
       )}
 
-      <div className="max-w-7xl mx-auto w-full space-y-5 relative z-10">
+      <div className="max-w-[1440px] mx-auto w-full space-y-5 relative z-10 px-2 sm:px-4">
 
         {/* Top Header with User Info, Theme Switch & Sign Out */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center pb-1 gap-3">
@@ -757,11 +755,10 @@ export default function Home() {
               onClick={toggleTheme}
               type="button"
               title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode`}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border transition cursor-pointer shadow-sm ${
-                isDark
-                  ? 'bg-[#222222] border-[#333333] text-gray-300 hover:text-white hover:border-[#444444]'
-                  : 'bg-white/90 border-gray-200 text-gray-700 hover:text-black hover:border-gray-300'
-              }`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border transition cursor-pointer shadow-sm ${isDark
+                ? 'bg-[#222222] border-[#333333] text-gray-300 hover:text-white hover:border-[#444444]'
+                : 'bg-white/90 border-gray-200 text-gray-700 hover:text-black hover:border-gray-300'
+                }`}
             >
               {isDark ? (
                 <>
@@ -778,9 +775,8 @@ export default function Home() {
 
             {/* User Account Pill */}
             <div
-              className={`flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs border shadow-sm ${
-                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 border-gray-200 backdrop-blur-md'
-              }`}
+              className={`flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs border shadow-sm ${isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 border-gray-200 backdrop-blur-md'
+                }`}
             >
               <div className="flex flex-col text-right">
                 <span className={`font-medium truncate max-w-[200px] sm:max-w-[220px] ${isDark ? 'text-white' : 'text-gray-950'}`}>
@@ -793,11 +789,10 @@ export default function Home() {
               <button
                 onClick={handleSignOut}
                 title="Sign Out"
-                className={`p-1.5 rounded-lg transition ml-1 cursor-pointer ${
-                  isDark
-                    ? 'text-[#888888] hover:text-red-400 hover:bg-[#2b2b2b]'
-                    : 'text-gray-400 hover:text-red-600 hover:bg-gray-100'
-                }`}
+                className={`p-1.5 rounded-lg transition ml-1 cursor-pointer ${isDark
+                  ? 'text-[#888888] hover:text-red-400 hover:bg-[#2b2b2b]'
+                  : 'text-gray-400 hover:text-red-600 hover:bg-gray-100'
+                  }`}
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -812,9 +807,8 @@ export default function Home() {
 
             {/* Combined Single Card: WhatsApp & Import */}
             <div
-              className={`rounded-2xl p-5 space-y-4 border transition-colors ${
-                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 backdrop-blur-md border-gray-200/90 shadow-sm'
-              }`}
+              className={`rounded-3xl p-5 sm:p-6 space-y-4 border transition-colors ${isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/95 backdrop-blur-md border-gray-200/90 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.07)]'
+                }`}
             >
 
               {/* WhatsApp Section */}
@@ -824,18 +818,19 @@ export default function Home() {
                     WhatsApp Connection
                   </h2>
                   {waStatus === 'connected' ? (
-                    <span className="text-[11px] bg-[#89c900] text-black px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5 shadow-sm">
-                      <span className="w-1.5 h-1.5 rounded-full bg-black" /> Connected
+                    <span className="text-[10px] leading-none bg-[#89c900] text-gray-950 px-2 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-gray-950 shrink-0" />
+                      <span>Connected</span>
                     </span>
                   ) : waStatus === 'connecting' ? (
-                    <span className="text-[11px] bg-amber-500/10 text-amber-500 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1.5">
-                      <RefreshCw className="w-3 h-3 animate-spin text-amber-500" /> Scanning...
+                    <span className="text-[10px] leading-none bg-amber-500/10 text-amber-500 border border-amber-500/30 px-2 py-0.5 rounded-full font-semibold flex items-center gap-1">
+                      <RefreshCw className="w-3 h-3 animate-spin text-amber-500 shrink-0" />
+                      <span>Scanning...</span>
                     </span>
                   ) : (
                     <span
-                      className={`text-[11px] px-2.5 py-0.5 rounded-full font-medium border ${
-                        isDark ? 'bg-[#2b2b2b] text-[#888888] border-[#383838]' : 'bg-gray-100 text-gray-500 border-gray-200'
-                      }`}
+                      className={`text-[10px] leading-none px-2 py-0.5 rounded-full font-semibold border ${isDark ? 'bg-[#2b2b2b] text-[#888888] border-[#383838]' : 'bg-gray-100 text-gray-500 border-gray-200'
+                        }`}
                     >
                       Not Connected
                     </span>
@@ -849,9 +844,8 @@ export default function Home() {
                 {/* QR Code Display when Connecting */}
                 {waStatus === 'connecting' && waQrCode && (
                   <div
-                    className={`rounded-xl p-2.5 flex flex-col items-center space-y-1.5 text-center border ${
-                      isDark ? 'bg-[#181818] border-[#3a3a3a]' : 'bg-gray-50 border-gray-200'
-                    }`}
+                    className={`rounded-xl p-2.5 flex flex-col items-center space-y-1.5 text-center border ${isDark ? 'bg-[#181818] border-[#3a3a3a]' : 'bg-gray-50 border-gray-200'
+                      }`}
                   >
                     <div className="bg-white p-2 rounded-lg shadow-inner">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -878,11 +872,10 @@ export default function Home() {
                   type="button"
                   onClick={handleConnectWhatsApp}
                   disabled={waLoading}
-                  className={`w-full font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition cursor-pointer border ${
-                    isDark
-                      ? 'bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border-[#444444] text-white'
-                      : 'bg-gray-900 hover:bg-black text-white border-transparent shadow-sm'
-                  }`}
+                  className={`w-full font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition cursor-pointer border ${isDark
+                    ? 'bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border-[#444444] text-white'
+                    : 'bg-gray-900 hover:bg-black text-white border-transparent shadow-sm'
+                    }`}
                 >
                   {waLoading ? (
                     <>
@@ -917,9 +910,8 @@ export default function Home() {
                     Import Property Listings
                   </h2>
                   <span
-                    className={`text-[11px] px-1.5 py-0.5 rounded font-mono ${
-                      isDark ? 'bg-[#2b2b2b] text-[#888888]' : 'bg-gray-100 text-gray-500'
-                    }`}
+                    className={`text-[11px] px-1.5 py-0.5 rounded font-mono ${isDark ? 'bg-[#2b2b2b] text-[#888888]' : 'bg-gray-100 text-gray-500'
+                      }`}
                   >
                     CSV
                   </span>
@@ -937,11 +929,10 @@ export default function Home() {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className={`w-full font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer border ${
-                    isDark
-                      ? 'bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border-[#444444] text-white'
-                      : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-300'
-                  }`}
+                  className={`w-full font-medium py-2 px-3 rounded-lg text-[13px] flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer border ${isDark
+                    ? 'bg-[#2a2a2a] hover:bg-[#333333] active:bg-[#3a3a3a] border-[#444444] text-white'
+                    : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-300'
+                    }`}
                 >
                   {uploading ? (
                     <>
@@ -958,15 +949,14 @@ export default function Home() {
 
                 {importResult && (
                   <div
-                    className={`p-2 rounded-lg text-xs flex items-start gap-1.5 ${
-                      importResult.success
-                        ? isDark
-                          ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
-                          : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                        : isDark
+                    className={`p-2 rounded-lg text-xs flex items-start gap-1.5 ${importResult.success
+                      ? isDark
+                        ? 'bg-[#1b2a1e] border border-[#2e5235] text-[#7ce090]'
+                        : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                      : isDark
                         ? 'bg-[#2d1b1b] border border-[#542828] text-[#f87171]'
                         : 'bg-red-50 border border-red-200 text-red-800'
-                    }`}
+                      }`}
                   >
                     {importResult.success ? (
                       <>
@@ -995,9 +985,8 @@ export default function Home() {
 
             {/* Template Editor Card */}
             <div
-              className={`rounded-2xl p-5 space-y-3 border transition-colors ${
-                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 backdrop-blur-md border-gray-200/90 shadow-sm'
-              }`}
+              className={`rounded-3xl p-5 sm:p-6 space-y-3 border transition-colors ${isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/95 backdrop-blur-md border-gray-200/90 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.07)]'
+                }`}
             >
               <h2 className={`text-lg font-semibold tracking-tight ${isDark ? 'text-white' : 'text-gray-950'}`}>
                 Message Template
@@ -1017,11 +1006,10 @@ export default function Home() {
                     key={item.tag}
                     type="button"
                     onClick={() => insertTag(item.tag)}
-                    className={`text-xs px-2.5 py-1 rounded-lg border transition cursor-pointer font-medium ${
-                      isDark
-                        ? 'bg-[#89c900]/15 hover:bg-[#89c900]/25 text-[#d8e454] border-[#89c900]/40'
-                        : 'bg-[#89c900]/15 hover:bg-[#89c900]/25 text-gray-900 border-[#89c900]/40'
-                    }`}
+                    className={`text-xs px-2.5 py-1 rounded-lg border transition cursor-pointer font-medium ${isDark
+                      ? 'bg-[#89c900]/15 hover:bg-[#89c900]/25 text-[#d8e454] border-[#89c900]/40'
+                      : 'bg-[#89c900]/15 hover:bg-[#89c900]/25 text-gray-900 border-[#89c900]/40'
+                      }`}
                   >
                     {item.label}
                   </button>
@@ -1031,11 +1019,10 @@ export default function Home() {
                 rows={4}
                 value={template}
                 onChange={e => setTemplate(e.target.value)}
-                className={`w-full rounded-xl p-3 text-[13px] border focus:outline-none focus:border-[#89c900] leading-relaxed resize-y ${
-                  isDark
-                    ? 'bg-[#181818] border-[#3a3a3a] text-white'
-                    : 'bg-gray-50 border-gray-200 text-gray-900'
-                }`}
+                className={`w-full rounded-xl p-3 text-[13px] border focus:outline-none focus:border-[#89c900] leading-relaxed resize-y ${isDark
+                  ? 'bg-[#181818] border-[#3a3a3a] text-white'
+                  : 'bg-gray-50 border-gray-200 text-gray-900'
+                  }`}
               />
 
               {/* Send Button */}
@@ -1043,13 +1030,12 @@ export default function Home() {
                 type="button"
                 onClick={handleDispatch}
                 disabled={sending || selectedIds.size === 0}
-                className={`w-full font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-sm cursor-pointer ${
-                  sending || selectedIds.size === 0
-                    ? isDark
-                      ? 'bg-[#2a2a2a] text-[#666666] border border-[#383838] cursor-not-allowed shadow-none'
-                      : 'bg-gray-200 text-gray-500 border border-gray-300/80 cursor-not-allowed shadow-none'
-                    : 'bg-[#89c900] hover:bg-[#7bb700] active:bg-[#6fa500] text-gray-950 shadow-md cursor-pointer'
-                }`}
+                className={`w-full font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition ${sending || selectedIds.size === 0
+                  ? isDark
+                    ? 'bg-[#2a2a2a] text-[#666666] border border-[#383838] cursor-not-allowed shadow-none'
+                    : 'bg-gray-200 text-gray-500 border border-gray-300/80 cursor-not-allowed shadow-none'
+                  : 'bg-[#89c900] hover:bg-[#7bb700] active:bg-[#6fa500] text-gray-950 shadow-md cursor-pointer'
+                  }`}
               >
                 {sending ? (
                   <RefreshCw className={`w-4 h-4 animate-spin ${selectedIds.size === 0 ? (isDark ? 'text-[#666666]' : 'text-gray-500') : 'text-gray-950'}`} />
@@ -1065,15 +1051,14 @@ export default function Home() {
 
               {dispatchResult && (
                 <div
-                  className={`p-3 rounded-xl text-xs border ${
-                    dispatchResult.success
-                      ? isDark
-                        ? 'bg-[#1b2a1e] border-[#2e5235] text-[#7ce090]'
-                        : 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                      : isDark
+                  className={`p-3 rounded-xl text-xs border ${dispatchResult.success
+                    ? isDark
+                      ? 'bg-[#1b2a1e] border-[#2e5235] text-[#7ce090]'
+                      : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                    : isDark
                       ? 'bg-[#2d1b1b] border-[#542828] text-[#f87171]'
                       : 'bg-red-50 border-red-200 text-red-900'
-                  }`}
+                    }`}
                 >
                   {dispatchResult.success ? (
                     <div className="space-y-1">
@@ -1098,29 +1083,26 @@ export default function Home() {
             {/* Inline Search Bar */}
             <form
               onSubmit={handleSearch}
-              className={`rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-3 border transition-colors relative z-30 ${
-                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 backdrop-blur-md border-gray-200/90 shadow-sm'
-              }`}
+              className={`rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-3 border transition-colors relative z-30 ${isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/95 backdrop-blur-md border-gray-200/90 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.06)]'
+                }`}
             >
               <div className="relative flex-1 min-w-[180px] w-full">
                 <input
                   type="text"
-                  placeholder="Search building, owner, unit..."
+                  placeholder="Search by building, owner, phone or unit number"
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className={`w-full rounded-xl px-4 py-2.5 text-sm border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
-                    isDark
-                      ? 'bg-[#181818] border-[#3a3a3a] text-white placeholder-[#666666]'
-                      : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
-                  }`}
+                  className={`w-full rounded-xl px-4 py-2.5 text-sm border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${isDark
+                    ? 'bg-[#181818] border-[#3a3a3a] text-white placeholder-[#666666]'
+                    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+                    }`}
                 />
                 {searchTerm && (
                   <button
                     type="button"
                     onClick={() => setSearchTerm('')}
-                    className={`absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer ${
-                      isDark ? 'text-[#888888] hover:text-white' : 'text-gray-400 hover:text-gray-700'
-                    }`}
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer ${isDark ? 'text-[#888888] hover:text-white' : 'text-gray-400 hover:text-gray-700'
+                      }`}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -1135,11 +1117,10 @@ export default function Home() {
                     setIsBuildingOpen(!isBuildingOpen);
                     setIsRoomsOpen(false);
                   }}
-                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border transition focus:outline-none focus:border-blue-500 cursor-pointer ${
-                    isDark
-                      ? 'bg-[#181818] border-[#3a3a3a] text-white hover:border-[#555555]'
-                      : 'bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300'
-                  }`}
+                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border transition focus:outline-none focus:border-blue-500 cursor-pointer ${isDark
+                    ? 'bg-[#181818] border-[#3a3a3a] text-white hover:border-[#555555]'
+                    : 'bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300'
+                    }`}
                 >
                   <span className="truncate pr-2">
                     {buildingsLoading
@@ -1151,9 +1132,8 @@ export default function Home() {
 
                 {isBuildingOpen && (
                   <div
-                    className={`absolute top-full left-0 mt-1.5 w-full rounded-xl border shadow-2xl z-50 overflow-hidden ${
-                      isDark ? 'bg-[#1e1e1e] border-[#3a3a3a]' : 'bg-white border-gray-200'
-                    }`}
+                    className={`absolute top-full left-0 mt-1.5 w-full rounded-xl border shadow-2xl z-50 overflow-hidden ${isDark ? 'bg-[#1e1e1e] border-[#3a3a3a]' : 'bg-white border-gray-200'
+                      }`}
                   >
                     {/* Optional Quick Filter input if list is long */}
                     {buildings.length > 6 && (
@@ -1163,11 +1143,10 @@ export default function Home() {
                           placeholder="Filter buildings..."
                           value={buildingSearch}
                           onChange={e => setBuildingSearch(e.target.value)}
-                          className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
-                            isDark
-                              ? 'bg-[#222222] border-[#333333] text-white placeholder-[#777777] focus:border-blue-500'
-                              : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'
-                          }`}
+                          className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${isDark
+                            ? 'bg-[#222222] border-[#333333] text-white placeholder-[#777777] focus:border-blue-500'
+                            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'
+                            }`}
                         />
                       </div>
                     )}
@@ -1180,15 +1159,14 @@ export default function Home() {
                           setIsBuildingOpen(false);
                           setBuildingSearch('');
                         }}
-                        className={`w-full text-left px-3.5 py-2 text-sm flex items-center justify-between transition cursor-pointer ${
-                          !selectedBuilding
-                            ? isDark
-                              ? 'bg-blue-600/20 text-blue-400 font-semibold'
-                              : 'bg-blue-50 text-blue-600 font-semibold'
-                            : isDark
+                        className={`w-full text-left px-3.5 py-2 text-sm flex items-center justify-between transition cursor-pointer ${!selectedBuilding
+                          ? isDark
+                            ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                            : 'bg-blue-50 text-blue-600 font-semibold'
+                          : isDark
                             ? 'hover:bg-[#2a2a2a] text-white'
                             : 'hover:bg-gray-50 text-gray-800'
-                        }`}
+                          }`}
                       >
                         <span>All Buildings ({buildings.length.toLocaleString()})</span>
                         {!selectedBuilding && <Check className="w-3.5 h-3.5 text-blue-500" />}
@@ -1205,15 +1183,14 @@ export default function Home() {
                               setIsBuildingOpen(false);
                               setBuildingSearch('');
                             }}
-                            className={`w-full text-left px-3.5 py-2 text-sm flex items-center justify-between transition cursor-pointer ${
-                              selectedBuilding === b
-                                ? isDark
-                                  ? 'bg-blue-600/20 text-blue-400 font-semibold'
-                                  : 'bg-blue-50 text-blue-600 font-semibold'
-                                : isDark
+                            className={`w-full text-left px-3.5 py-2 text-sm flex items-center justify-between transition cursor-pointer ${selectedBuilding === b
+                              ? isDark
+                                ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                                : 'bg-blue-50 text-blue-600 font-semibold'
+                              : isDark
                                 ? 'hover:bg-[#2a2a2a] text-[#cccccc] hover:text-white'
                                 : 'hover:bg-gray-50 text-gray-800'
-                            }`}
+                              }`}
                           >
                             <span className="truncate pr-2">{b}</span>
                             {selectedBuilding === b && <Check className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />}
@@ -1225,52 +1202,49 @@ export default function Home() {
               </div>
 
               {/* Rooms Multi-Select Dropdown */}
-              <div ref={roomsDropdownRef} className="relative w-full sm:w-52 flex-shrink-0">
+              <div ref={roomsDropdownRef} className="relative w-full sm:w-48 flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => {
                     setIsRoomsOpen(!isRoomsOpen);
                     setIsBuildingOpen(false);
                   }}
-                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border transition focus:outline-none focus:border-blue-500 cursor-pointer ${
-                    isDark
-                      ? 'bg-[#181818] border-[#3a3a3a] text-white hover:border-[#555555]'
-                      : 'bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300'
-                  }`}
+                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border transition focus:outline-none focus:border-blue-500 cursor-pointer ${isDark
+                    ? 'bg-[#181818] border-[#3a3a3a] text-white hover:border-[#555555]'
+                    : 'bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300'
+                    }`}
                 >
                   <span className="truncate pr-2">
                     {roomsLoading
-                      ? 'Loading bedrooms...'
+                      ? 'Loading rooms...'
                       : selectedRooms.length === 0
-                      ? 'All Bedrooms / Types'
-                      : selectedRooms.length === 1
-                      ? formatRoomLabel(selectedRooms[0])
-                      : `${selectedRooms.length} Types Selected`}
+                        ? 'All Rooms'
+                        : selectedRooms.length === 1
+                          ? formatRoomLabel(selectedRooms[0])
+                          : `${selectedRooms.length} Rooms Selected`}
                   </span>
                   <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isRoomsOpen ? 'rotate-180' : ''} ${isDark ? 'text-[#888888]' : 'text-gray-500'}`} />
                 </button>
 
                 {isRoomsOpen && (
                   <div
-                    className={`absolute top-full left-0 mt-1.5 w-full rounded-xl border shadow-2xl z-50 max-h-60 overflow-y-auto py-1 ${
-                      isDark ? 'bg-[#1e1e1e] border-[#3a3a3a]' : 'bg-white border-gray-200'
-                    }`}
+                    className={`absolute top-full left-0 mt-1.5 w-full rounded-xl border shadow-2xl z-50 max-h-60 overflow-y-auto py-1 ${isDark ? 'bg-[#1e1e1e] border-[#3a3a3a]' : 'bg-white border-gray-200'
+                      }`}
                   >
                     {roomsLoading ? (
                       <div className={`px-3 py-3 text-sm text-center ${isDark ? 'text-[#888888]' : 'text-gray-400'}`}>
-                        Loading bedrooms...
+                        Loading rooms...
                       </div>
                     ) : roomsOptions.length === 0 ? (
                       <div className={`px-3 py-3 text-sm text-center ${isDark ? 'text-[#888888]' : 'text-gray-400'}`}>
-                        No types found
+                        No rooms found
                       </div>
                     ) : (
                       roomsOptions.map(room => (
                         <label
                           key={room}
-                          className={`flex items-center gap-2.5 px-3.5 py-2 cursor-pointer text-sm transition ${
-                            isDark ? 'hover:bg-[#2a2a2a] text-white' : 'hover:bg-gray-50 text-gray-900'
-                          }`}
+                          className={`flex items-center gap-2.5 px-3.5 py-2 cursor-pointer text-sm transition ${isDark ? 'hover:bg-[#2a2a2a] text-white' : 'hover:bg-gray-50 text-gray-900'
+                            }`}
                         >
                           <input
                             type="checkbox"
@@ -1308,11 +1282,10 @@ export default function Home() {
                   type="button"
                   onClick={handleClearFilters}
                   title="Clear all filters"
-                  className={`h-[42px] px-3.5 rounded-xl border transition flex items-center justify-center flex-shrink-0 w-full sm:w-11 cursor-pointer shadow-sm ${
-                    isDark
-                      ? 'bg-[#181818] border-[#3a3a3a] text-[#aaaaaa] hover:text-white hover:bg-[#252525] hover:border-[#555555]'
-                      : 'bg-white border-gray-200 text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
-                  }`}
+                  className={`h-[42px] px-3.5 rounded-xl border transition flex items-center justify-center flex-shrink-0 w-full sm:w-11 cursor-pointer shadow-sm ${isDark
+                    ? 'bg-[#181818] border-[#3a3a3a] text-[#aaaaaa] hover:text-white hover:bg-[#252525] hover:border-[#555555]'
+                    : 'bg-white border-gray-200 text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
+                    }`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1321,33 +1294,29 @@ export default function Home() {
 
             {/* Results & Checkbox Table Card */}
             <div
-              className={`rounded-2xl p-5 flex flex-col min-h-[520px] space-y-4 border transition-colors ${
-                isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/90 backdrop-blur-md border-gray-200/90 shadow-sm'
-              }`}
+              className={`rounded-3xl p-5 sm:p-6 flex flex-col min-h-[520px] space-y-4 border transition-colors ${isDark ? 'bg-[#222222] border-[#333333]' : 'bg-white/95 backdrop-blur-md border-gray-200/90 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.07)]'
+                }`}
             >
               <div
-                className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-2 ${
-                  isDark ? 'border-[#2d2d2d]' : 'border-gray-200'
-                }`}
+                className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-2 ${isDark ? 'border-[#2d2d2d]' : 'border-gray-200'
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <h2 className={`text-lg font-semibold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-950'}`}>
                     <span>Properties Found</span>
                     <span
-                      className={`text-xs border px-2.5 py-0.5 rounded-full font-mono font-medium ${
-                        isDark
-                          ? 'bg-[#89c900]/15 text-[#d8e454] border-[#89c900]/40'
-                          : 'bg-[#89c900]/15 text-gray-900 border-[#89c900]/40'
-                      }`}
+                      className={`text-xs border px-2.5 py-0.5 rounded-full font-mono font-medium ${isDark
+                        ? 'bg-[#89c900]/15 text-[#d8e454] border-[#89c900]/40'
+                        : 'bg-[#89c900]/15 text-gray-900 border-[#89c900]/40'
+                        }`}
                     >
                       {results.length.toLocaleString()}
                     </span>
                   </h2>
                   {results.length > 0 && (
                     <span
-                      className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-bold shadow-sm ${
-                        isDark ? 'bg-white text-gray-950' : 'bg-gray-950 text-white'
-                      }`}
+                      className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-bold shadow-sm ${isDark ? 'bg-white text-gray-950' : 'bg-gray-950 text-white'
+                        }`}
                     >
                       {selectedIds.size} of {results.length} selected
                     </span>
@@ -1359,20 +1328,18 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={toggleSelectAll}
-                      className={`text-xs px-3 py-1.5 rounded-lg border transition cursor-pointer font-medium ${
-                        isDark
-                          ? 'bg-[#2d2d2d] hover:bg-[#383838] border-[#444444] text-[#cccccc] hover:text-white'
-                          : 'bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-800'
-                      }`}
+                      className={`text-xs px-3 py-1.5 rounded-lg border transition cursor-pointer font-medium ${isDark
+                        ? 'bg-[#2d2d2d] hover:bg-[#383838] border-[#444444] text-[#cccccc] hover:text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-800'
+                        }`}
                     >
                       {isAllSelected ? 'Deselect All' : 'Select All'}
                     </button>
                     <button
                       type="button"
                       onClick={handleClearFilters}
-                      className={`text-xs transition ml-2 cursor-pointer font-medium ${
-                        isDark ? 'text-[#888888] hover:text-white' : 'text-gray-500 hover:text-gray-900'
-                      }`}
+                      className={`text-xs transition ml-2 cursor-pointer font-medium ${isDark ? 'text-[#888888] hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                        }`}
                     >
                       Clear results
                     </button>
@@ -1399,15 +1366,13 @@ export default function Home() {
                 </div>
               ) : (
                 <div
-                  className={`overflow-x-auto flex-1 max-h-[650px] overflow-y-auto rounded-xl border ${
-                    isDark ? 'border-[#2d2d2d]' : 'border-gray-200'
-                  }`}
+                  className={`overflow-x-auto flex-1 max-h-[650px] overflow-y-auto rounded-xl border ${isDark ? 'border-[#2d2d2d]' : 'border-gray-200'
+                    }`}
                 >
                   <table className="w-full text-left border-collapse text-sm">
                     <thead
-                      className={`sticky top-0 z-10 shadow-sm border-b font-medium ${
-                        isDark ? 'bg-[#1a1a1a] text-[#aaaaaa] border-[#2d2d2d]' : 'bg-gray-50 text-gray-600 border-gray-200'
-                      }`}
+                      className={`sticky top-0 z-10 shadow-sm border-b font-medium ${isDark ? 'bg-[#1a1a1a] text-[#aaaaaa] border-[#2d2d2d]' : 'bg-gray-50 text-gray-600 border-gray-200'
+                        }`}
                     >
                       <tr>
                         <th className="py-3 px-3 w-10 text-center">
@@ -1430,9 +1395,8 @@ export default function Home() {
                       </tr>
                     </thead>
                     <tbody
-                      className={`divide-y ${
-                        isDark ? 'divide-[#2a2a2a] bg-[#1f1f1f]' : 'divide-gray-100 bg-white'
-                      }`}
+                      className={`divide-y ${isDark ? 'divide-[#2a2a2a] bg-[#1f1f1f]' : 'divide-gray-100 bg-white'
+                        }`}
                     >
                       {results.map((row: any) => {
                         const isSelected = selectedIds.has(row.id);
@@ -1448,15 +1412,14 @@ export default function Home() {
                           <tr
                             key={row.id}
                             onClick={() => toggleSelectRow(row.id)}
-                            className={`transition cursor-pointer group ${
-                              isSelected
-                                ? isDark
-                                  ? 'bg-[#1e293b]/50 hover:bg-[#1e293b]/70'
-                                  : 'bg-blue-50/80 hover:bg-blue-100/80'
-                                : isDark
+                            className={`transition cursor-pointer group ${isSelected
+                              ? isDark
+                                ? 'bg-[#1e293b]/50 hover:bg-[#1e293b]/70'
+                                : 'bg-blue-50/80 hover:bg-blue-100/80'
+                              : isDark
                                 ? 'hover:bg-[#282828]'
                                 : 'hover:bg-gray-50/80'
-                            }`}
+                              }`}
                           >
                             <td className="py-3 px-3 text-center" onClick={e => e.stopPropagation()}>
                               <input
@@ -1467,9 +1430,8 @@ export default function Home() {
                               />
                             </td>
                             <td
-                              className={`py-3 px-4 font-medium whitespace-nowrap ${
-                                isDark ? 'text-white' : 'text-gray-950'
-                              }`}
+                              className={`py-3 px-4 font-medium whitespace-nowrap ${isDark ? 'text-white' : 'text-gray-950'
+                                }`}
                             >
                               {row.owner_name || <span className="opacity-40 italic">Unknown</span>}
                             </td>
@@ -1483,9 +1445,8 @@ export default function Home() {
                                     copyToClipboard(row.phone);
                                   }}
                                   title="Copy phone number"
-                                  className={`opacity-0 group-hover:opacity-100 transition p-1 cursor-pointer ${
-                                    isDark ? 'text-[#888888] hover:text-white' : 'text-gray-400 hover:text-gray-800'
-                                  }`}
+                                  className={`opacity-0 group-hover:opacity-100 transition p-1 cursor-pointer ${isDark ? 'text-[#888888] hover:text-white' : 'text-gray-400 hover:text-gray-800'
+                                    }`}
                                 >
                                   {copiedPhone === row.phone ? (
                                     <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -1500,9 +1461,8 @@ export default function Home() {
                             </td>
                             <td className={`py-3 px-4 whitespace-nowrap ${isDark ? 'text-[#cccccc]' : 'text-gray-700'}`}>
                               <span
-                                className={`px-2 py-0.5 rounded text-xs border ${
-                                  isDark ? 'bg-[#2a2a2a] border-transparent' : 'bg-gray-100 border-gray-200'
-                                }`}
+                                className={`px-2 py-0.5 rounded text-xs border ${isDark ? 'bg-[#2a2a2a] border-transparent' : 'bg-gray-100 border-gray-200'
+                                  }`}
                               >
                                 {row.unit_number || '-'}
                               </span>
@@ -1512,11 +1472,10 @@ export default function Home() {
                             </td>
                             <td className={`py-3 px-4 max-w-xs truncate ${isDark ? 'text-[#aaaaaa]' : 'text-gray-600'}`} title={msg}>
                               <span
-                                className={`text-xs px-2.5 py-1 rounded-lg block truncate border ${
-                                  isDark
-                                    ? 'bg-[#181818] border-[#2e2e2e]'
-                                    : 'bg-gray-50 border-gray-200 text-gray-700'
-                                }`}
+                                className={`text-xs px-2.5 py-1 rounded-lg block truncate border ${isDark
+                                  ? 'bg-[#181818] border-[#2e2e2e]'
+                                  : 'bg-gray-50 border-gray-200 text-gray-700'
+                                  }`}
                               >
                                 {msg}
                               </span>
