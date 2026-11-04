@@ -721,9 +721,21 @@ export default function Home() {
 
   return (
     <main
-      className={`min-h-screen p-4 md:p-6 font-sans text-base transition-colors duration-200 relative ${isDark ? 'bg-[#181818] text-[#e1e1e1]' : 'bg-[#fafafd] text-gray-900 overflow-x-hidden'
+      className={`min-h-screen p-4 md:p-6 font-sans text-base transition-colors duration-200 relative overflow-x-hidden ${isDark ? 'bg-[#141414] text-[#e1e1e1]' : 'bg-[#fafafd] text-gray-900'
         }`}
     >
+      {/* Background radial gradients for Dark theme */}
+      {isDark && (
+        <>
+          {/* Subtle tech blue / slate glow - matches selected row & active accents */}
+          <div className="absolute -top-32 -left-32 w-[720px] h-[720px] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.06)_0%,transparent_65%)] pointer-events-none" />
+          {/* Subtle brand green accent */}
+          <div className="absolute top-1/4 -right-32 w-[750px] h-[750px] bg-[radial-gradient(ellipse_at_center,rgba(137,201,0,0.05)_0%,transparent_65%)] pointer-events-none" />
+          {/* Deep indigo / slate blue ambient glow */}
+          <div className="absolute -bottom-32 left-1/3 w-[720px] h-[720px] bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.05)_0%,transparent_65%)] pointer-events-none" />
+        </>
+      )}
+
       {/* Background blurs for Light theme matching public views */}
       {!isDark && (
         <>
@@ -1305,7 +1317,7 @@ export default function Home() {
                   <h2 className={`text-lg font-semibold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-950'}`}>
                     <span>Properties Found</span>
                     <span
-                      className={`text-xs border px-2.5 py-0.5 rounded-full font-mono font-medium ${isDark
+                      className={`text-xs border px-2.5 py-0.5 rounded-full font-medium ${isDark
                         ? 'bg-[#89c900]/15 text-[#d8e454] border-[#89c900]/40'
                         : 'bg-[#89c900]/15 text-gray-900 border-[#89c900]/40'
                         }`}
@@ -1315,7 +1327,7 @@ export default function Home() {
                   </h2>
                   {results.length > 0 && (
                     <span
-                      className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-bold shadow-sm ${isDark ? 'bg-white text-gray-950' : 'bg-gray-950 text-white'
+                      className={`text-xs px-2.5 py-0.5 rounded-full font-medium shadow-sm ${isDark ? 'bg-white text-gray-950' : 'bg-gray-950 text-white'
                         }`}
                     >
                       {selectedIds.size} of {results.length} selected
