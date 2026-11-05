@@ -3,14 +3,15 @@
 import React, { useState, useMemo } from 'react';
 import {
   X,
-  Sparkles,
   CheckCircle2,
   AlertCircle,
   RefreshCw,
   Upload,
   Globe,
   Building2,
-  Filter
+  Filter,
+  ChevronDown,
+  Check
 } from 'lucide-react';
 import type { DetectedSchema } from '@/app/api/import/detect-schema/route';
 
@@ -20,6 +21,7 @@ interface AiImportModalProps {
   allCleanLines: string[];
   initialSchema: DetectedSchema;
   provider: string;
+  isDark?: boolean;
   onClose: () => void;
   onImportSuccess: (totalImported: number) => void;
 }
@@ -93,6 +95,7 @@ export default function AiImportModal({
   allCleanLines,
   initialSchema,
   provider,
+  isDark = true,
   onClose,
   onImportSuccess
 }: AiImportModalProps) {
@@ -101,6 +104,7 @@ export default function AiImportModal({
   const [importing, setImporting] = useState<boolean>(false);
   const [progressText, setProgressText] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const columns = useMemo(() => {
     return parseCSVLineClient(allCleanLines[schema.headerRowIndex] || '');
@@ -278,25 +282,49 @@ export default function AiImportModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
-      <div className="bg-[#1c1c1c] border border-[#2e2e2e] rounded-3xl max-w-5xl w-full p-6 sm:p-8 shadow-2xl space-y-6 text-[#e1e1e1] max-h-[90vh] flex flex-col">
+      <div
+        className={`rounded-3xl max-w-5xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col border transition-colors ${
+          isDark
+            ? 'bg-[#1c1c1c] border-[#2e2e2e] text-[#e1e1e1]'
+            : 'bg-white border-gray-200/90 text-gray-900'
+        }`}
+      >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[#2a2a2a] pb-5">
+        <div
+          className={`flex items-start justify-between border-b pb-5 ${
+            isDark ? 'border-[#2a2a2a]' : 'border-gray-100'
+          }`}
+        >
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#89c900]/15 text-[#d8e454] border border-[#89c900]/30 flex items-center gap-1.5">
+              <span
+                className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                  isDark
+                    ? 'bg-[#89c900]/15 text-[#d8e454] border-[#89c900]/30'
+                    : 'bg-[#89c900]/15 text-gray-950 border-[#89c900]/40'
+                }`}
+              >
                 {provider === 'mistral-ai' ? 'Mistral AI Schema Mapped' : 'Smart Auto-Mapped'}
               </span>
-              <span className="text-xs text-[#888888] font-medium truncate max-w-sm">
-                File: <span className="text-gray-300">{fileName}</span>
+              <span className={`text-xs font-medium truncate max-w-sm ${isDark ? 'text-[#888888]' : 'text-gray-500'}`}>
+                File: <span className={isDark ? 'text-gray-300' : 'text-gray-900 font-semibold'}>{fileName}</span>
               </span>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">AI Property Importer</h2>
-            <p className="text-xs text-[#888888] max-w-2xl leading-relaxed">{schema.explanation}</p>
+            <h2 className={`text-2xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-gray-950 font-pagani'}`}>
+              AI Property Importer
+            </h2>
+            <p className={`text-xs max-w-2xl leading-relaxed ${isDark ? 'text-[#888888]' : 'text-gray-600'}`}>
+              {schema.explanation}
+            </p>
           </div>
           <button
             onClick={onClose}
             disabled={importing}
-            className="text-[#777777] hover:text-white p-2 rounded-xl hover:bg-[#262626] transition cursor-pointer"
+            className={`p-2 rounded-xl transition cursor-pointer ${
+              isDark
+                ? 'text-[#777777] hover:text-white hover:bg-[#262626]'
+                : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
+            }`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -305,54 +333,140 @@ export default function AiImportModal({
         {/* Body Scrollable */}
         <div className="overflow-y-auto space-y-6 pr-1 flex-1">
           {/* Global Settings Row: Country Dial Code, Size Unit, Building Filter */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#141414] border border-[#282828] p-4 rounded-2xl">
+          <div
+            className={`grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-2xl border transition-colors ${
+              isDark
+                ? 'bg-[#141414] border-[#282828]'
+                : 'bg-gray-50/90 border-gray-200/80'
+            }`}
+          >
             <div>
-              <label className="block text-xs font-medium text-[#aaaaaa] mb-1.5 flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-[#888888]" />
+              <label
+                className={`block text-xs font-medium mb-1.5 flex items-center gap-1.5 ${
+                  isDark ? 'text-[#aaaaaa]' : 'text-gray-700'
+                }`}
+              >
+                <Globe className={`w-3.5 h-3.5 ${isDark ? 'text-[#888888]' : 'text-gray-400'}`} />
                 Default Country Code (for local phones)
               </label>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs text-[#888888] font-medium bg-[#1e1e1e] px-3 py-2 rounded-xl border border-[#2e2e2e]">
+                <span
+                  className={`text-xs font-medium px-3 py-2 rounded-xl border ${
+                    isDark
+                      ? 'bg-[#1e1e1e] text-[#888888] border-[#2e2e2e]'
+                      : 'bg-white text-gray-500 border-gray-200'
+                  }`}
+                >
                   +
                 </span>
                 <input
                   type="text"
-                  placeholder="e.g. 971, 34, 1, 44 (or empty)"
+                  placeholder="e.g. 971, 34, 1, 44"
                   value={schema.defaultDialCode}
                   onChange={e =>
                     setSchema(prev => ({ ...prev, defaultDialCode: e.target.value.replace(/\D/g, '') }))
                   }
-                  className="w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#89c900] transition"
+                  className={`w-full rounded-xl px-3.5 py-2 text-xs border focus:outline-none transition ${
+                    isDark
+                      ? 'bg-[#1e1e1e] border-[#2e2e2e] text-white focus:border-[#89c900]'
+                      : 'bg-white border-gray-200 text-gray-900 focus:border-[#89c900] shadow-sm'
+                  }`}
                 />
               </div>
-              <span className="text-[11px] text-[#666666] mt-1.5 block">
+              <span className={`text-[11px] mt-1.5 block ${isDark ? 'text-[#666666]' : 'text-gray-500'}`}>
                 Detected: {schema.inferredCountryName}
               </span>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-[#aaaaaa] mb-1.5 flex items-center gap-1.5">
-                <Building2 className="w-3.5 h-3.5 text-[#888888]" />
+            {/* Custom Area Unit Dropdown */}
+            <div className="relative">
+              <label
+                className={`block text-xs font-medium mb-1.5 flex items-center gap-1.5 ${
+                  isDark ? 'text-[#aaaaaa]' : 'text-gray-700'
+                }`}
+              >
+                <Building2 className={`w-3.5 h-3.5 ${isDark ? 'text-[#888888]' : 'text-gray-400'}`} />
                 Area Unit Conversion
               </label>
-              <select
-                value={schema.sizeUnit}
-                onChange={e =>
-                  setSchema(prev => ({ ...prev, sizeUnit: e.target.value as 'sqm' | 'sqft' }))
-                }
-                className="w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#89c900] transition cursor-pointer"
+              <button
+                type="button"
+                onClick={() => setOpenDropdown(openDropdown === 'sizeUnit' ? null : 'sizeUnit')}
+                className={`w-full rounded-xl px-3.5 py-2 text-xs flex justify-between items-center border transition focus:outline-none cursor-pointer ${
+                  isDark
+                    ? 'bg-[#1e1e1e] border-[#2e2e2e] text-white hover:border-[#3a3a3a] focus:border-[#89c900]'
+                    : 'bg-white border-gray-200 text-gray-900 hover:border-gray-300 focus:border-[#89c900] shadow-sm'
+                }`}
               >
-                <option value="sqm">Square Meters (m²)</option>
-                <option value="sqft">Square Feet (SqFt ➔ auto-converts to m²)</option>
-              </select>
-              <span className="text-[11px] text-[#666666] mt-1.5 block">
+                <span className="truncate">
+                  {schema.sizeUnit === 'sqft'
+                    ? 'Square Feet (SqFt ➔ auto-converts to m²)'
+                    : 'Square Meters (m²)'}
+                </span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 ${
+                    openDropdown === 'sizeUnit' ? 'rotate-180' : ''
+                  } ${isDark ? 'text-[#888888]' : 'text-gray-400'}`}
+                />
+              </button>
+
+              {openDropdown === 'sizeUnit' && (
+                <div
+                  className={`absolute top-full left-0 mt-1.5 w-full rounded-xl border shadow-2xl z-50 overflow-hidden py-1 ${
+                    isDark ? 'bg-[#1e1e1e] border-[#333333]' : 'bg-white border-gray-200'
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSchema(prev => ({ ...prev, sizeUnit: 'sqm' }));
+                      setOpenDropdown(null);
+                    }}
+                    className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition cursor-pointer ${
+                      schema.sizeUnit === 'sqm'
+                        ? isDark
+                          ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                          : 'bg-blue-50 text-blue-600 font-semibold'
+                        : isDark
+                        ? 'hover:bg-[#262626] text-white'
+                        : 'hover:bg-gray-50 text-gray-800'
+                    }`}
+                  >
+                    <span>Square Meters (m²)</span>
+                    {schema.sizeUnit === 'sqm' && <Check className="w-3.5 h-3.5 text-blue-500" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSchema(prev => ({ ...prev, sizeUnit: 'sqft' }));
+                      setOpenDropdown(null);
+                    }}
+                    className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition cursor-pointer ${
+                      schema.sizeUnit === 'sqft'
+                        ? isDark
+                          ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                          : 'bg-blue-50 text-blue-600 font-semibold'
+                        : isDark
+                        ? 'hover:bg-[#262626] text-white'
+                        : 'hover:bg-gray-50 text-gray-800'
+                    }`}
+                  >
+                    <span>Square Feet (SqFt ➔ auto-converts to m²)</span>
+                    {schema.sizeUnit === 'sqft' && <Check className="w-3.5 h-3.5 text-blue-500" />}
+                  </button>
+                </div>
+              )}
+              <span className={`text-[11px] mt-1.5 block ${isDark ? 'text-[#666666]' : 'text-gray-500'}`}>
                 Target storage: square meters
               </span>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[#aaaaaa] mb-1.5 flex items-center gap-1.5">
-                <Filter className="w-3.5 h-3.5 text-[#888888]" />
+              <label
+                className={`block text-xs font-medium mb-1.5 flex items-center gap-1.5 ${
+                  isDark ? 'text-[#aaaaaa]' : 'text-gray-700'
+                }`}
+              >
+                <Filter className={`w-3.5 h-3.5 ${isDark ? 'text-[#888888]' : 'text-gray-400'}`} />
                 Filter Specific Building (Optional)
               </label>
               <input
@@ -361,52 +475,160 @@ export default function AiImportModal({
                 placeholder="Import all, or type e.g. BELGRAVIA SQUARE"
                 value={buildingFilter}
                 onChange={e => setBuildingFilter(e.target.value)}
-                className="w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#89c900] transition"
+                className={`w-full rounded-xl px-3.5 py-2 text-xs border focus:outline-none transition ${
+                  isDark
+                    ? 'bg-[#1e1e1e] border-[#2e2e2e] text-white focus:border-[#89c900]'
+                    : 'bg-white border-gray-200 text-gray-900 focus:border-[#89c900] shadow-sm'
+                }`}
               />
               <datalist id="csv-buildings-list">
                 {availableBuildings.map(b => (
                   <option key={b} value={b} />
                 ))}
               </datalist>
-              <span className="text-[11px] text-[#666666] mt-1.5 block">
+              <span className={`text-[11px] mt-1.5 block ${isDark ? 'text-[#666666]' : 'text-gray-500'}`}>
                 Leave empty to import all buildings in file
               </span>
             </div>
           </div>
 
-          {/* Column Mappings Grid */}
+          {/* Column Mappings Grid with Custom Styled Dropdowns */}
           <div className="space-y-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#777777]">
-              AI Detected Column Mapping
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+              <h3 className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-[#777777]' : 'text-gray-500'}`}>
+                Column Mapping (Select matching CSV header for each database field)
+              </h3>
+              <span className={`text-[11px] ${isDark ? 'text-[#888888]' : 'text-gray-500'}`}>
+                Click any dropdown below to reassign or manually match columns
+              </span>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {mappingFields.map(field => {
                 const selectedIdx = schema.mapping[field.key];
+                const isOpen = openDropdown === field.key;
+                const selectedColName =
+                  selectedIdx !== null && selectedIdx !== undefined && columns[selectedIdx]
+                    ? `[${selectedIdx}] ${columns[selectedIdx]}`
+                    : '-- Not Mapped / Ignore --';
+
                 return (
                   <div
                     key={field.key}
-                    className="bg-[#222222] border border-[#2e2e2e] rounded-xl p-3 flex flex-col justify-between space-y-2 hover:border-[#383838] transition"
+                    className={`rounded-2xl p-3 flex flex-col justify-between space-y-2 border transition relative ${
+                      isDark
+                        ? 'bg-[#222222] border-[#2e2e2e] hover:border-[#383838]'
+                        : 'bg-white border-gray-200/90 shadow-sm hover:border-gray-300'
+                    }`}
                   >
-                    <label className="text-xs font-medium text-[#cccccc] flex items-center justify-between">
+                    <label
+                      className={`text-xs font-medium flex items-center justify-between ${
+                        isDark ? 'text-[#cccccc]' : 'text-gray-800'
+                      }`}
+                    >
                       <span>{field.label}</span>
                       {field.required && (
-                        <span className="text-[10px] bg-red-950/80 text-red-400 border border-red-800/50 px-1.5 py-0.5 rounded font-medium">
+                        <span
+                          className={`text-[10px] px-1.5 py-0.5 rounded font-medium border ${
+                            isDark
+                              ? 'bg-red-950/80 text-red-400 border-red-800/50'
+                              : 'bg-red-50 text-red-700 border-red-200'
+                          }`}
+                        >
                           Required
                         </span>
                       )}
                     </label>
-                    <select
-                      value={selectedIdx !== null && selectedIdx !== undefined ? String(selectedIdx) : ''}
-                      onChange={e => updateMapping(field.key, e.target.value)}
-                      className="w-full bg-[#161616] border border-[#333333] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#89c900] cursor-pointer"
-                    >
-                      <option value="">-- Not Mapped / Ignore --</option>
-                      {columns.map((colName, idx) => (
-                        <option key={idx} value={String(idx)}>
-                          [{idx}] {colName || `(Column ${idx + 1})`}
-                        </option>
-                      ))}
-                    </select>
+
+                    {/* Custom Dropdown Trigger Button */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setOpenDropdown(isOpen ? null : field.key)}
+                        className={`w-full rounded-xl px-3 py-2 text-xs flex justify-between items-center border transition focus:outline-none cursor-pointer text-left ${
+                          isDark
+                            ? 'bg-[#161616] border-[#333333] text-white hover:border-[#444444] focus:border-blue-500'
+                            : 'bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300 focus:border-blue-500'
+                        }`}
+                      >
+                        <span
+                          className={`truncate pr-2 ${
+                            selectedIdx === null || selectedIdx === undefined
+                              ? isDark
+                                ? 'text-[#777777]'
+                                : 'text-gray-400'
+                              : 'font-medium'
+                          }`}
+                        >
+                          {selectedColName}
+                        </span>
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 ${
+                            isOpen ? 'rotate-180' : ''
+                          } ${isDark ? 'text-[#777777]' : 'text-gray-400'}`}
+                        />
+                      </button>
+
+                      {/* Custom Dropdown List styled with dark scrollbars & active items */}
+                      {isOpen && (
+                        <div
+                          className={`absolute top-full left-0 mt-1.5 w-full rounded-xl border shadow-2xl z-50 max-h-56 overflow-y-auto py-1 ${
+                            isDark ? 'bg-[#1a1a1a] border-[#383838]' : 'bg-white border-gray-200'
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              updateMapping(field.key, '');
+                              setOpenDropdown(null);
+                            }}
+                            className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between transition cursor-pointer ${
+                              selectedIdx === null || selectedIdx === undefined
+                                ? isDark
+                                  ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                                  : 'bg-blue-50 text-blue-600 font-semibold'
+                                : isDark
+                                ? 'hover:bg-[#252525] text-[#999999] hover:text-white'
+                                : 'hover:bg-gray-50 text-gray-600'
+                            }`}
+                          >
+                            <span>-- Not Mapped / Ignore --</span>
+                            {(selectedIdx === null || selectedIdx === undefined) && (
+                              <Check className="w-3.5 h-3.5 text-blue-500" />
+                            )}
+                          </button>
+
+                          {columns.map((colName, idx) => {
+                            const isSelected = selectedIdx === idx;
+                            return (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => {
+                                  updateMapping(field.key, String(idx));
+                                  setOpenDropdown(null);
+                                }}
+                                className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between transition cursor-pointer ${
+                                  isSelected
+                                    ? isDark
+                                      ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                                      : 'bg-blue-50 text-blue-600 font-semibold'
+                                    : isDark
+                                    ? 'hover:bg-[#252525] text-[#cccccc] hover:text-white'
+                                    : 'hover:bg-gray-50 text-gray-800'
+                                }`}
+                              >
+                                <span className="truncate pr-2">
+                                  [{idx}] {colName || `(Column ${idx + 1})`}
+                                </span>
+                                {isSelected && (
+                                  <Check className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -416,49 +638,84 @@ export default function AiImportModal({
           {/* Live Extraction Preview */}
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#777777]">
+              <h3 className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-[#777777]' : 'text-gray-500'}`}>
                 Live Data Preview (First 4 Valid Records)
               </h3>
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#89c900]/15 text-[#d8e454] border border-[#89c900]/30">
+                <span
+                  className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${
+                    isDark
+                      ? 'bg-[#89c900]/15 text-[#d8e454] border-[#89c900]/30'
+                      : 'bg-[#89c900]/15 text-gray-950 border-[#89c900]/40'
+                  }`}
+                >
                   ✓ {mappedRows.length.toLocaleString()} valid properties ready
                 </span>
                 {skippedNoPhoneCount > 0 && (
-                  <span className="text-[#666666]">
+                  <span className={isDark ? 'text-[#666666]' : 'text-gray-500'}>
                     ({skippedNoPhoneCount.toLocaleString()} rows without phone skipped)
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-[#2a2a2a] bg-[#141414]">
+            <div
+              className={`overflow-x-auto rounded-2xl border transition-colors ${
+                isDark ? 'border-[#2a2a2a] bg-[#141414]' : 'border-gray-200/90 bg-white shadow-sm'
+              }`}
+            >
               <table className="w-full text-left border-collapse text-xs">
-                <thead className="bg-[#1c1c1c] text-[#888888] border-b border-[#2a2a2a]">
+                <thead
+                  className={`border-b font-medium ${
+                    isDark
+                      ? 'bg-[#1c1c1c] text-[#888888] border-[#2a2a2a]'
+                      : 'bg-gray-50 text-gray-600 border-gray-200'
+                  }`}
+                >
                   <tr>
-                    <th className="py-2.5 px-3.5 font-medium">Owner Name</th>
-                    <th className="py-2.5 px-3.5 font-medium">Phone (E.164)</th>
-                    <th className="py-2.5 px-3.5 font-medium">Building</th>
-                    <th className="py-2.5 px-3.5 font-medium">Unit</th>
-                    <th className="py-2.5 px-3.5 font-medium">Rooms</th>
-                    <th className="py-2.5 px-3.5 font-medium">Size (m²)</th>
+                    <th className="py-2.5 px-3.5">Owner Name</th>
+                    <th className="py-2.5 px-3.5">Phone (E.164)</th>
+                    <th className="py-2.5 px-3.5">Building</th>
+                    <th className="py-2.5 px-3.5">Unit</th>
+                    <th className="py-2.5 px-3.5">Rooms</th>
+                    <th className="py-2.5 px-3.5">Size (m²)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#222222]">
+                <tbody
+                  className={`divide-y ${
+                    isDark ? 'divide-[#222222]' : 'divide-gray-100'
+                  }`}
+                >
                   {mappedRows.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-[#666666]">
+                      <td colSpan={6} className={`py-8 text-center ${isDark ? 'text-[#666666]' : 'text-gray-400'}`}>
                         No valid records match the current column mapping or filter.
                       </td>
                     </tr>
                   ) : (
                     mappedRows.slice(0, 4).map((r, i) => (
-                      <tr key={i} className="hover:bg-[#1b1b1b] transition-colors">
-                        <td className="py-2.5 px-3.5 font-medium text-white">{r.owner_name || '-'}</td>
-                        <td className="py-2.5 px-3.5 text-blue-400 font-medium">{r.phone}</td>
-                        <td className="py-2.5 px-3.5 text-[#cccccc]">{r.building_name}</td>
-                        <td className="py-2.5 px-3.5 text-[#cccccc]">{r.unit_number || '-'}</td>
-                        <td className="py-2.5 px-3.5 text-[#888888]">{r.rooms || '-'}</td>
-                        <td className="py-2.5 px-3.5 text-[#888888]">{r.size_sqm ?? '-'}</td>
+                      <tr
+                        key={i}
+                        className={`transition-colors ${
+                          isDark ? 'hover:bg-[#1b1b1b]' : 'hover:bg-gray-50'
+                        }`}
+                      >
+                        <td className={`py-2.5 px-3.5 font-medium ${isDark ? 'text-white' : 'text-gray-950'}`}>
+                          {r.owner_name || '-'}
+                        </td>
+                        <td className="py-2.5 px-3.5 text-blue-500 font-medium">{r.phone}</td>
+                        <td className={`py-2.5 px-3.5 ${isDark ? 'text-[#cccccc]' : 'text-gray-700'}`}>
+                          {r.building_name}
+                        </td>
+                        <td className={`py-2.5 px-3.5 ${isDark ? 'text-[#cccccc]' : 'text-gray-700'}`}>
+                          {r.unit_number || '-'}
+                        </td>
+                        <td className={`py-2.5 px-3.5 ${isDark ? 'text-[#888888]' : 'text-gray-500'}`}>
+                          {r.rooms || '-'}
+                        </td>
+                        <td className={`py-2.5 px-3.5 ${isDark ? 'text-[#888888]' : 'text-gray-500'}`}>
+                          {r.size_sqm ?? '-'}
+                        </td>
                       </tr>
                     ))
                   )}
@@ -468,7 +725,13 @@ export default function AiImportModal({
           </div>
 
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-800/50 text-red-400 text-xs flex items-center gap-2">
+            <div
+              className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 ${
+                isDark
+                  ? 'bg-red-950/40 border-red-800/50 text-red-400'
+                  : 'bg-red-50 border-red-200 text-red-700'
+              }`}
+            >
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -476,12 +739,20 @@ export default function AiImportModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-end gap-3 border-t border-[#2a2a2a] pt-5">
+        <div
+          className={`flex items-center justify-end gap-3 border-t pt-5 ${
+            isDark ? 'border-[#2a2a2a]' : 'border-gray-100'
+          }`}
+        >
           <button
             type="button"
             onClick={onClose}
             disabled={importing}
-            className="px-5 py-2.5 rounded-xl bg-[#242424] hover:bg-[#2d2d2d] text-xs font-medium text-[#cccccc] hover:text-white transition cursor-pointer border border-[#333333]"
+            className={`px-5 py-2.5 rounded-xl text-xs font-medium transition cursor-pointer border ${
+              isDark
+                ? 'bg-[#242424] hover:bg-[#2d2d2d] text-[#cccccc] hover:text-white border-[#333333]'
+                : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300 shadow-sm'
+            }`}
           >
             Cancel
           </button>
@@ -507,4 +778,4 @@ export default function AiImportModal({
       </div>
     </div>
   );
-}
+};

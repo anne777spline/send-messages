@@ -12,5 +12,37 @@
   font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
 }
 
+/* Custom Dark Theme Scrollbars (Enterprise SaaS) */
+.dark,
+.dark * {
+  scrollbar-color: #383838 #181818;
+  scrollbar-width: thin;
+}
+
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: #181818;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background-color: #181818;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: #383838;
+  border-radius: 4px;
+  border: 2px solid #181818;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: #4a4a4a;
+}
+
+.dark ::-webkit-scrollbar-corner {
+  background-color: #181818;
+}
+
 
 

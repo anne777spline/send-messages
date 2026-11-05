@@ -3,7 +3,7 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Sparkles, MessageSquare, Smartphone, Filter, CheckCheck } from 'lucide-react';
+import { FileSpreadsheet, MessageSquare, Smartphone, Filter, CheckCheck } from 'lucide-react';
 
 export default function FeaturesPage() {
   return (
@@ -41,7 +41,7 @@ export default function FeaturesPage() {
           <div className="bg-white/90 backdrop-blur-md border border-gray-200/90 rounded-3xl p-8 shadow-sm hover:shadow-xl transition space-y-6 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-md">
-                <Sparkles className="w-6 h-6 text-blue-400" />
+                <FileSpreadsheet className="w-6 h-6 text-blue-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-950 tracking-tight">AI-Powered Universal Import</h2>
               <p className="text-sm text-gray-600 leading-relaxed">

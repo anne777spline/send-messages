@@ -61,34 +61,91 @@ function buildFallbackSchema(sampleLines: string[], fileName: string): DetectedS
 
   const columns = parseCSVLine(sampleLines[headerRowIndex] || '');
   const lowerCols = columns.map(c => c.toLowerCase().trim());
+  const dataRows = sampleLines.slice(headerRowIndex + 1).map(line => parseCSVLine(line));
 
-  const findCol = (patterns: RegExp[]): number | null => {
-    for (const pat of patterns) {
-      const idx = lowerCols.findIndex(c => pat.test(c));
-      if (idx !== -1) return idx;
+  const findCol = (
+    headerPatterns: RegExp[],
+    excludePatterns: RegExp[] = [],
+    valueValidator?: (val: string) => boolean
+  ): number | null => {
+    // 1. Direct match with header and negative pattern filtering
+    for (let c = 0; c < lowerCols.length; c++) {
+      const colHeader = lowerCols[c];
+      if (excludePatterns.some(ex => ex.test(colHeader))) continue;
+      if (headerPatterns.some(pat => pat.test(colHeader))) {
+        if (!valueValidator) return c;
+        // Verify against sample values
+        const sampleVals = dataRows.map(row => (row[c] || '').trim()).filter(Boolean);
+        if (sampleVals.length === 0 || sampleVals.some(v => valueValidator(v))) {
+          return c;
+        }
+      }
     }
     return null;
   };
 
-  const phone = findCol([
-    /mobile|phone|tel|celular|movil|móvil|whatsapp|contact.*number|owner.*number|téléphone|telefone|handy/i
-  ]);
-  const owner_name = findCol([
-    /owner.*name|name.*en|propietario|titular|owner|buyer|landlord|client|nombre|nom|propriétaire|eigentümer/i
-  ]);
+  // Negative patterns for countries/nationalities to never confuse with owner_name
+  const nationalityHeaderPat = /nationality|nacionalidad|citizenship|country|país|pais/i;
+  const areaHeaderPat = /^area$|area\s*en|master\s*project|district|city|location|comunidad/i;
+
+  const phone = findCol(
+    [/mobile|phone|tel|celular|movil|móvil|whatsapp|contact.*number|owner.*number|téléphone|telefone|handy/i],
+    [/fax|passport|birth/i],
+    val => /\d{5,}/.test(val)
+  );
+
+  // Specific building/tower name (priority to exact building name headers, excluding numeric/ID/district columns)
+  const building_name =
+    findCol(
+      [/building.*name|edificio.*nombre|nom.*immeuble|property.*name/i],
+      [/no$|number$|id$|area|project|master/i]
+    ) ??
+    findCol(
+      [/building\/villa|building|edificio|torre|condominio|complex|immeuble|residence/i],
+      [/no$|number$|id$|code$|area/i, /master.*project/i, /room/i, /bed/i, /unit/i]
+    );
+
+  // Buyer/Owner full human name (must exclude building/project/property names, party roles, and nationalities)
+  const owner_name =
+    findCol(
+      [/owner.*name|titular|^owner$|^buyer$|^landlord$|^client$|^nombre$|^nom$|propriétaire|eigentümer/i],
+      [nationalityHeaderPat, /company/i, /developer/i, /agent/i, /broker/i, /building/i, /project/i, /property/i, /party/i]
+    ) ??
+    findCol(
+      [/name.*en|^name$|^nombre_completo$|full.*name/i],
+      [nationalityHeaderPat, /company/i, /developer/i, /agent/i, /broker/i, /building/i, /project/i, /property/i, /country/i, /procedure/i, /party/i]
+    );
+
   const email = findCol([/email|e-mail|correo|mail/i]);
-  const building_name = findCol([
-    /building.*name|building\/villa|building|edificio|torre|condominio|complex|immeuble|residence|property.*name/i
-  ]);
-  const project_fallback = findCol([/^project$|master.*project|proyecto|desarrollo|development/i]);
-  const unit_number = findCol([
-    /unit.*no|unit.*number|unit|apto|apartamento|depto|piso|puerta|flat|suite|villa.*no/i
-  ]);
-  const rooms = findCol([/rooms|bedrooms|beds|habitaciones|dormitorios|recamaras|recámaras|pièces|zimmer|property.*type/i]);
-  const size = findCol([/size|area.*sqm|area.*sqft|sqm|sqft|superficie|metraje|m2|metros/i]);
+
+  const project_fallback = findCol(
+    [/^project$|master.*project|proyecto|desarrollo|development/i],
+    [/unit/i, /room/i]
+  );
+
+  const unit_number = findCol(
+    [/unit.*no|unit.*number|^unit$|apto|apartamento|depto|piso|puerta|flat|suite|villa.*no/i],
+    [/rooms/i, /bedrooms/i, /type/i, /building/i, /area/i]
+  );
+
+  const rooms =
+    findCol(
+      [/^beds$|^bedrooms$|^rooms$|^bed$|^dormitorios$|^recamaras$|^habitaciones$/i],
+      [/building/i, /project/i, /area/i, /name/i, /mobile/i, /phone/i, /unit/i]
+    ) ??
+    findCol(
+      [/property.*type|sub.*type|^type$/i],
+      [/building/i, /project/i, /area/i, /name/i, /mobile/i, /phone/i, /unit/i]
+    );
+
+  const size = findCol(
+    [/^size$|area.*sqm|area.*sqft|sqm|sqft|superficie|metraje|m2|metros/i],
+    [/master/i, /^area$/i, /building/i]
+  );
+
   const plot_number = findCol([/plot|parcel|catastro/i]);
   const land_number = findCol([/land.*no|land.*number|municipality/i]);
-  const area_en = findCol([/^area|area.*en|city|district|zona|barrio|ciudad|location|master.*project/i]);
+  const area_en = findCol([areaHeaderPat]);
   const roleCol = findCol([/party.*type|procedure.*party|role|tipo.*parte|rol/i]);
 
   const cleanFileName = fileName
@@ -162,24 +219,31 @@ export async function POST(request: Request) {
 Your job is to inspect the first few rows of a user-uploaded CSV file (in ANY language: English, Spanish, French, Portuguese, Arabic, German, Russian, etc.) and return a JSON object mapping the CSV column indices to our database schema.
 
 Our database table 'properties' has these target fields:
-- phone (REQUIRED: mobile/telephone/WhatsApp number of the property owner/buyer)
-- owner_name (Full name of the owner, landlord, or buyer)
+- phone (REQUIRED: mobile/telephone/WhatsApp number of the property owner/buyer. Must be a contact phone column, NEVER a plot or land number).
+- owner_name (REQUIRED: Full name of the human person or company owner/buyer/landlord. NEVER map a "Nationality", "Citizenship", "Country" or "Passport" column to owner_name!).
 - email (Email address if present, otherwise null)
-- building_name (Name of the building, tower, condominium, residence, or sub-project)
+- building_name (Name of the specific building or tower, e.g., "LUMA PARK VIEWS", "ABJAR TOWER", "BLOOM TOWERS A". NEVER map a broad city district, neighborhood or master community like "Jumeirah Village Circle", "JVC", "Downtown", "Al Barsha" to building_name; those belong to area_en!).
 - project_fallback (Secondary column for project/development name if building_name is empty or generic)
-- unit_number (Apartment, unit, flat, suite, puerta, or villa number)
-- rooms (Number of bedrooms/rooms or unit layout like Studio, 1BR, 2, etc.)
-- size (Property area/surface numeric value)
+- unit_number (Apartment, unit, flat, suite, or villa number, e.g. "101", "204", "1A")
+- rooms (Number of bedrooms/rooms or unit layout like "Studio", "1BR", "1", "2", "3", "Office", "Retail", "Penthouse". NEVER map a building or tower name to rooms!).
+- size (Property area/surface numeric value in sqm or sqft)
 - plot_number (Plot or parcel identifier if present)
 - land_number (Land or registration number if present)
-- area_en (District, neighborhood, city, or master community name)
+- area_en (District, neighborhood, city, or master community name, e.g. "Jumeirah Village Circle", "JVC", "Business Bay", "Downtown Dubai", "Al Barsha", "Dubai Marina")
 
-Carefully check:
-1. "headerRowIndex": Sometimes row 0 is a title banner (e.g. "JVC,,,,") and row 1 is the actual header row. Identify the exact 0-based rowIndex of the header row.
-2. "roleFilter": Some government/registry exports (like DLD or land registries) list both "Seller" (developer) and "Buyer" (actual current owner) on separate rows. If there is a column indicating party role (e.g., ProcedurePartyTypeNameEn, Party Type, Rol), set "columnIndex" to that column's index and "allowedValues" to ["Buyer", "Owner", "Landlord", "Comprador", "Propietario", "Purchaser"]. Otherwise set "columnIndex": null and "allowedValues": [].
-3. "sizeUnit": Set to "sqft" if the header or values clearly indicate square feet, otherwise "sqm".
-4. "inferredCountryName" & "defaultDialCode": Infer the country from location names, project names, or phone numbers (e.g., Dubai/JVC -> "United Arab Emirates" and defaultDialCode "971"; Spain -> "34"; USA -> "1"; UK -> "44"; Mexico -> "52"). Use digits only for defaultDialCode (no + sign). If international/mixed, use "".
-5. "defaultBuildingName": Clean human-readable building name inferred from the filename "${fileName}" or sample rows in case a row has no building name.
+Strict Anti-Confusion Rules:
+1. "building_name" vs "area_en":
+   - "Jumeirah Village Circle", "JVC", "Al Barsha", "Business Bay", "Downtown" are master communities/districts -> ALWAYS area_en.
+   - Specific residential/commercial buildings like "LUMA PARK VIEWS", "ABJAR TOWER", "BINGHATTI EMERALD", "GHALIA" -> ALWAYS building_name.
+2. "rooms" vs "building_name":
+   - "rooms" is ONLY for bedroom counts (1, 2, 3) or unit typologies (Studio, 1BR, 2BR, Penthouse, Office, Retail, Apartment). If a column contains building names (e.g., "LUMA PARK VIEWS"), it is NEVER rooms!
+3. "owner_name" vs "nationality":
+   - If a column contains country names like "Egypt", "Russian Federation", "KYRGYZ REPUBLIC", "Lebanon", "United Kingdom", that column is Nationality, NOT owner_name! Map owner_name to the actual person's name column (e.g. "NameEn", "Owner Name", "Client Name", "Purchaser Name").
+4. "headerRowIndex": Sometimes row 0 is a title banner (e.g. "JVC,,,,") and row 1 is the actual header row. Identify the exact 0-based rowIndex of the header row.
+5. "roleFilter": If there is a column indicating party role (e.g., ProcedurePartyTypeNameEn, Party Type, Rol), set "columnIndex" to that column's index and "allowedValues" to ["Buyer", "Owner", "Landlord", "Comprador", "Propietario", "Purchaser"]. Otherwise set "columnIndex": null and "allowedValues": [].
+6. "sizeUnit": Set to "sqft" if the header or values clearly indicate square feet, otherwise "sqm".
+7. "inferredCountryName" & "defaultDialCode": Infer the country from location names, project names, or phone numbers (e.g., Dubai/JVC -> "United Arab Emirates" and defaultDialCode "971"). Use digits only for defaultDialCode (no + sign).
+8. "defaultBuildingName": Clean human-readable building name inferred from the filename "${fileName}" or sample rows in case a row has no building name.
 
 Return ONLY a valid JSON object matching this exact structure:
 {

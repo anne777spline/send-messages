@@ -52,8 +52,20 @@ export async function GET(request: Request) {
           .range(p * 1000, (p + 1) * 1000 - 1);
         if (error || !data || data.length === 0) break;
         data.forEach((r: any) => {
-          if (r.rooms && r.rooms.trim()) {
-            set.add(r.rooms.trim());
+          if (r.rooms) {
+            const raw = String(r.rooms).trim();
+            const lower = raw.toLowerCase();
+            if (
+              raw &&
+              lower !== 'null' &&
+              lower !== 'undefined' &&
+              lower !== 'none' &&
+              lower !== 'n/a' &&
+              lower !== '-' &&
+              lower !== 'nan'
+            ) {
+              set.add(raw);
+            }
           }
         });
       }

@@ -41,7 +41,20 @@ function formatRoomLabel(val: string): string {
   const trimmed = String(val).trim();
   const lower = trimmed.toLowerCase();
 
-  // If already contains descriptive words
+  // If empty or literal string "null", "undefined", "none", "n/a", "-"
+  if (
+    !trimmed ||
+    lower === 'null' ||
+    lower === 'undefined' ||
+    lower === 'none' ||
+    lower === 'n/a' ||
+    lower === '-' ||
+    lower === 'nan'
+  ) {
+    return '';
+  }
+
+  // If already contains descriptive words (room, bed, studio, office, retail, etc.)
   if (
     lower.includes('room') ||
     lower.includes('bed') ||
@@ -49,7 +62,16 @@ function formatRoomLabel(val: string): string {
     lower.includes('office') ||
     lower.includes('unit') ||
     lower.includes('retail') ||
-    lower.includes('floor')
+    lower.includes('floor') ||
+    lower.includes('club') ||
+    lower.includes('hotel') ||
+    lower.includes('apartment') ||
+    lower.includes('villa') ||
+    lower.includes('penthouse') ||
+    lower.includes('duplex') ||
+    lower.includes('townhouse') ||
+    lower.includes('shop') ||
+    lower.includes('warehouse')
   ) {
     return trimmed;
   }
@@ -75,11 +97,12 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('broker_assistant_theme') as 'light' | 'dark' | null;
-      if (savedTheme === 'dark' || savedTheme === 'light') {
-        setTheme(savedTheme);
+      const initial = savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : 'light';
+      setTheme(initial);
+      if (initial === 'dark') {
+        document.documentElement.classList.add('dark');
       } else {
-        // Default for new users: light
-        setTheme('light');
+        document.documentElement.classList.remove('dark');
       }
     }
   }, []);
@@ -89,6 +112,11 @@ export default function Home() {
     setTheme(nextTheme);
     if (typeof window !== 'undefined') {
       localStorage.setItem('broker_assistant_theme', nextTheme);
+      if (nextTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
   };
 
@@ -311,7 +339,20 @@ export default function Home() {
       const res = await fetch('/api/properties?action=rooms');
       const data = await res.json();
       if (data.success && Array.isArray(data.rooms)) {
-        setRoomsOptions(data.rooms);
+        const cleaned = data.rooms.filter((r: any) => {
+          if (!r) return false;
+          const lower = String(r).trim().toLowerCase();
+          return (
+            lower !== '' &&
+            lower !== 'null' &&
+            lower !== 'undefined' &&
+            lower !== 'none' &&
+            lower !== 'n/a' &&
+            lower !== '-' &&
+            lower !== 'nan'
+          );
+        });
+        setRoomsOptions(cleaned);
       }
     } catch (err) {
       console.error('Error loading rooms:', err);
@@ -1500,6 +1541,7 @@ export default function Home() {
           allCleanLines={csvCleanLines}
           initialSchema={detectedSchema}
           provider={aiProvider}
+          isDark={isDark}
           onClose={() => {
             setAiModalOpen(false);
             setCsvCleanLines([]);

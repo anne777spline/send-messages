@@ -22,6 +22,23 @@ function parseCSVLine(text: string): string[] {
   return result;
 }
 
+function cleanRoomsValue(raw: any): string {
+  if (!raw) return '';
+  const str = String(raw).trim();
+  const lower = str.toLowerCase();
+  if (
+    lower === 'null' ||
+    lower === 'undefined' ||
+    lower === 'none' ||
+    lower === 'n/a' ||
+    lower === '-' ||
+    lower === 'nan'
+  ) {
+    return '';
+  }
+  return str.slice(0, 50);
+}
+
 function cleanUniversalPhone(rawPhone: string, defaultDialCode: string = ''): string {
   if (!rawPhone) return '';
   let str = String(rawPhone).trim();
@@ -138,7 +155,7 @@ export async function POST(request: Request) {
           email: String(r.email || '').trim().slice(0, 255),
           building_name: String(r.building_name || 'Imported Building').trim().slice(0, 255),
           unit_number: String(r.unit_number || '').trim().slice(0, 100),
-          rooms: String(r.rooms || '').trim().slice(0, 50),
+          rooms: cleanRoomsValue(r.rooms),
           size_sqm: typeof r.size_sqm === 'number' && !isNaN(r.size_sqm) ? Number(r.size_sqm.toFixed(2)) : null,
           plot_number: String(r.plot_number || '').trim().slice(0, 100),
           land_number: String(r.land_number || '').trim().slice(0, 100),
@@ -221,7 +238,7 @@ export async function POST(request: Request) {
           email: (m.email !== null ? p[m.email] || '' : '').trim().slice(0, 255),
           building_name: (buildingFilter ? buildingFilter : building_name).slice(0, 255),
           unit_number: (m.unit_number !== null ? p[m.unit_number] || '' : '').trim().slice(0, 100),
-          rooms: roomsRaw.slice(0, 50),
+          rooms: cleanRoomsValue(roomsRaw),
           size_sqm: sizeVal,
           plot_number: (m.plot_number !== null ? p[m.plot_number] || '' : '').trim().slice(0, 100),
           land_number: (m.land_number !== null ? p[m.land_number] || '' : '').trim().slice(0, 100),

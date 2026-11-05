@@ -20,9 +20,10 @@ Fuera de la paleta del tema (grises, blancos, negros y acento verde de Six Tenet
 3. **Rojo:** Exclusivo para errores destructivos, badges requeridos (`Required`) o confirmaciones de borrado/fallo.
 4. **Verde:** Exclusivo para éxito confirmado o estados de conexión online.
 
-### C. Prohibición de Iconos Multicolor
+### C. Prohibición de Iconos Multicolor y Prohibición Estricta de Sparkles
 - **Queda terminantemente prohibido colorear iconos con arcoíris de colores** (e.g. pintar un icono azul, otro verde, otro ámbar solo para adornar campos de un formulario).
 - Los iconos de soporte en inputs y labels deben ser **monocromáticos**, sobrios y elegantes, usando la paleta neutra (`text-gray-400` / `text-[#888888]`) o el acento de marca cuando esté activo.
+- **PROHIBIDO TOTALMENTE EL USO DEL ICONO `Sparkles` / ESTRELLITAS:** No utilizar jamás `Sparkles` en ninguna parte de la plataforma (ni en modales, ni en badges de IA, ni en landings, ni en ningún componente). La empresa rechaza este recurso visual por completo; usar labels limpios o iconos de acción directa si aplica.
 
 ---
 
