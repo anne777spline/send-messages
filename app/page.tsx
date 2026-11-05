@@ -721,21 +721,9 @@ export default function Home() {
 
   return (
     <main
-      className={`min-h-screen p-4 md:p-6 font-sans text-base transition-colors duration-200 relative overflow-x-hidden ${isDark ? 'bg-[#141414] text-[#e1e1e1]' : 'bg-[#fafafd] text-gray-900'
+      className={`min-h-screen p-4 md:p-6 font-sans text-base transition-colors duration-200 relative ${isDark ? 'bg-[#181818] text-[#e1e1e1]' : 'bg-[#fafafd] text-gray-900 overflow-x-hidden'
         }`}
     >
-      {/* Background radial gradients for Dark theme */}
-      {isDark && (
-        <>
-          {/* Subtle tech blue / slate glow - matches selected row & active accents */}
-          <div className="absolute -top-32 -left-32 w-[720px] h-[720px] bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.06)_0%,transparent_65%)] pointer-events-none" />
-          {/* Subtle brand green accent */}
-          <div className="absolute top-1/4 -right-32 w-[750px] h-[750px] bg-[radial-gradient(ellipse_at_center,rgba(137,201,0,0.05)_0%,transparent_65%)] pointer-events-none" />
-          {/* Deep indigo / slate blue ambient glow */}
-          <div className="absolute -bottom-32 left-1/3 w-[720px] h-[720px] bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.05)_0%,transparent_65%)] pointer-events-none" />
-        </>
-      )}
-
       {/* Background blurs for Light theme matching public views */}
       {!isDark && (
         <>

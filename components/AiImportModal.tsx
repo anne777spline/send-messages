@@ -277,41 +277,42 @@ export default function AiImportModal({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-[#1e1e1e] border border-[#333333] rounded-2xl max-w-4xl w-full p-6 shadow-2xl space-y-5 text-[#e1e1e1] max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
+      <div className="bg-[#1c1c1c] border border-[#2e2e2e] rounded-3xl max-w-5xl w-full p-6 sm:p-8 shadow-2xl space-y-6 text-[#e1e1e1] max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[#2e2e2e] pb-4">
-          <div className="space-y-1">
+        <div className="flex items-start justify-between border-b border-[#2a2a2a] pb-5">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="bg-[#89c900]/20 text-[#d8e454] border border-[#89c900]/40 px-2.5 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" />
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#89c900]/15 text-[#d8e454] border border-[#89c900]/30 flex items-center gap-1.5">
                 {provider === 'mistral-ai' ? 'Mistral AI Schema Mapped' : 'Smart Auto-Mapped'}
               </span>
-              <span className="text-xs text-[#888888] font-mono truncate max-w-xs">{fileName}</span>
+              <span className="text-xs text-[#888888] font-medium truncate max-w-sm">
+                File: <span className="text-gray-300">{fileName}</span>
+              </span>
             </div>
-            <h2 className="text-xl font-bold text-white">Universal AI Property Importer</h2>
-            <p className="text-xs text-[#999999]">{schema.explanation}</p>
+            <h2 className="text-2xl font-bold tracking-tight text-white">AI Property Importer</h2>
+            <p className="text-xs text-[#888888] max-w-2xl leading-relaxed">{schema.explanation}</p>
           </div>
           <button
             onClick={onClose}
             disabled={importing}
-            className="text-[#888888] hover:text-white p-1.5 rounded-lg hover:bg-[#2a2a2a] transition cursor-pointer"
+            className="text-[#777777] hover:text-white p-2 rounded-xl hover:bg-[#262626] transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Body Scrollable */}
-        <div className="overflow-y-auto space-y-5 pr-1 flex-1">
+        <div className="overflow-y-auto space-y-6 pr-1 flex-1">
           {/* Global Settings Row: Country Dial Code, Size Unit, Building Filter */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-[#161616] border border-[#2b2b2b] p-3.5 rounded-xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#141414] border border-[#282828] p-4 rounded-2xl">
             <div>
-              <label className="block text-[11px] font-medium text-[#999999] mb-1 flex items-center gap-1">
-                <Globe className="w-3.5 h-3.5 text-blue-400" />
+              <label className="block text-xs font-medium text-[#aaaaaa] mb-1.5 flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5 text-[#888888]" />
                 Default Country Code (for local phones)
               </label>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs text-[#888888] font-mono bg-[#222222] px-2.5 py-2 rounded-lg border border-[#333333]">
+                <span className="text-xs text-[#888888] font-medium bg-[#1e1e1e] px-3 py-2 rounded-xl border border-[#2e2e2e]">
                   +
                 </span>
                 <input
@@ -321,17 +322,17 @@ export default function AiImportModal({
                   onChange={e =>
                     setSchema(prev => ({ ...prev, defaultDialCode: e.target.value.replace(/\D/g, '') }))
                   }
-                  className="w-full bg-[#222222] border border-[#3a3a3a] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#89c900]"
+                  className="w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#89c900] transition"
                 />
               </div>
-              <span className="text-[10px] text-[#666666] mt-0.5 block">
+              <span className="text-[11px] text-[#666666] mt-1.5 block">
                 Detected: {schema.inferredCountryName}
               </span>
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-[#999999] mb-1 flex items-center gap-1">
-                <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+              <label className="block text-xs font-medium text-[#aaaaaa] mb-1.5 flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-[#888888]" />
                 Area Unit Conversion
               </label>
               <select
@@ -339,16 +340,19 @@ export default function AiImportModal({
                 onChange={e =>
                   setSchema(prev => ({ ...prev, sizeUnit: e.target.value as 'sqm' | 'sqft' }))
                 }
-                className="w-full bg-[#222222] border border-[#3a3a3a] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#89c900]"
+                className="w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#89c900] transition cursor-pointer"
               >
                 <option value="sqm">Square Meters (m²)</option>
                 <option value="sqft">Square Feet (SqFt ➔ auto-converts to m²)</option>
               </select>
+              <span className="text-[11px] text-[#666666] mt-1.5 block">
+                Target storage: square meters
+              </span>
             </div>
 
             <div>
-              <label className="block text-[11px] font-medium text-[#999999] mb-1 flex items-center gap-1">
-                <Filter className="w-3.5 h-3.5 text-amber-400" />
+              <label className="block text-xs font-medium text-[#aaaaaa] mb-1.5 flex items-center gap-1.5">
+                <Filter className="w-3.5 h-3.5 text-[#888888]" />
                 Filter Specific Building (Optional)
               </label>
               <input
@@ -357,22 +361,22 @@ export default function AiImportModal({
                 placeholder="Import all, or type e.g. BELGRAVIA SQUARE"
                 value={buildingFilter}
                 onChange={e => setBuildingFilter(e.target.value)}
-                className="w-full bg-[#222222] border border-[#3a3a3a] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#89c900]"
+                className="w-full bg-[#1e1e1e] border border-[#2e2e2e] rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-[#89c900] transition"
               />
               <datalist id="csv-buildings-list">
                 {availableBuildings.map(b => (
                   <option key={b} value={b} />
                 ))}
               </datalist>
-              <span className="text-[10px] text-[#666666] mt-0.5 block">
+              <span className="text-[11px] text-[#666666] mt-1.5 block">
                 Leave empty to import all buildings in file
               </span>
             </div>
           </div>
 
           {/* Column Mappings Grid */}
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#888888] mb-2.5">
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#777777]">
               AI Detected Column Mapping
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -381,12 +385,12 @@ export default function AiImportModal({
                 return (
                   <div
                     key={field.key}
-                    className="bg-[#252525] border border-[#333333] rounded-xl p-2.5 flex flex-col justify-between"
+                    className="bg-[#222222] border border-[#2e2e2e] rounded-xl p-3 flex flex-col justify-between space-y-2 hover:border-[#383838] transition"
                   >
-                    <label className="text-xs font-medium text-[#cccccc] mb-1 flex items-center justify-between">
+                    <label className="text-xs font-medium text-[#cccccc] flex items-center justify-between">
                       <span>{field.label}</span>
                       {field.required && (
-                        <span className="text-[10px] bg-red-950/80 text-red-400 border border-red-800/50 px-1.5 py-0.2 rounded">
+                        <span className="text-[10px] bg-red-950/80 text-red-400 border border-red-800/50 px-1.5 py-0.5 rounded font-medium">
                           Required
                         </span>
                       )}
@@ -394,7 +398,7 @@ export default function AiImportModal({
                     <select
                       value={selectedIdx !== null && selectedIdx !== undefined ? String(selectedIdx) : ''}
                       onChange={e => updateMapping(field.key, e.target.value)}
-                      className="w-full bg-[#181818] border border-[#3a3a3a] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                      className="w-full bg-[#161616] border border-[#333333] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#89c900] cursor-pointer"
                     >
                       <option value="">-- Not Mapped / Ignore --</option>
                       {columns.map((colName, idx) => (
@@ -410,51 +414,51 @@ export default function AiImportModal({
           </div>
 
           {/* Live Extraction Preview */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#888888]">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#777777]">
                 Live Data Preview (First 4 Valid Records)
               </h3>
-              <div className="flex items-center gap-3 text-xs">
-                <span className="text-emerald-400 font-semibold">
-                  ✓ {mappedRows.length.toLocaleString()} valid unique properties ready
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#89c900]/15 text-[#d8e454] border border-[#89c900]/30">
+                  ✓ {mappedRows.length.toLocaleString()} valid properties ready
                 </span>
                 {skippedNoPhoneCount > 0 && (
-                  <span className="text-[#777777]">
+                  <span className="text-[#666666]">
                     ({skippedNoPhoneCount.toLocaleString()} rows without phone skipped)
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-[#2e2e2e] bg-[#161616]">
+            <div className="overflow-x-auto rounded-2xl border border-[#2a2a2a] bg-[#141414]">
               <table className="w-full text-left border-collapse text-xs">
-                <thead className="bg-[#222222] text-[#999999] border-b border-[#2e2e2e]">
+                <thead className="bg-[#1c1c1c] text-[#888888] border-b border-[#2a2a2a]">
                   <tr>
-                    <th className="py-2 px-3">Owner Name</th>
-                    <th className="py-2 px-3">Phone (E.164)</th>
-                    <th className="py-2 px-3">Building</th>
-                    <th className="py-2 px-3">Unit</th>
-                    <th className="py-2 px-3">Rooms</th>
-                    <th className="py-2 px-3">Size (m²)</th>
+                    <th className="py-2.5 px-3.5 font-medium">Owner Name</th>
+                    <th className="py-2.5 px-3.5 font-medium">Phone (E.164)</th>
+                    <th className="py-2.5 px-3.5 font-medium">Building</th>
+                    <th className="py-2.5 px-3.5 font-medium">Unit</th>
+                    <th className="py-2.5 px-3.5 font-medium">Rooms</th>
+                    <th className="py-2.5 px-3.5 font-medium">Size (m²)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#252525]">
+                <tbody className="divide-y divide-[#222222]">
                   {mappedRows.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-[#666666]">
+                      <td colSpan={6} className="py-8 text-center text-[#666666]">
                         No valid records match the current column mapping or filter.
                       </td>
                     </tr>
                   ) : (
                     mappedRows.slice(0, 4).map((r, i) => (
-                      <tr key={i} className="hover:bg-[#1f1f1f]">
-                        <td className="py-2 px-3 font-medium text-white">{r.owner_name || '-'}</td>
-                        <td className="py-2 px-3 font-mono text-blue-400">{r.phone}</td>
-                        <td className="py-2 px-3 text-[#cccccc]">{r.building_name}</td>
-                        <td className="py-2 px-3 text-[#cccccc]">{r.unit_number || '-'}</td>
-                        <td className="py-2 px-3 text-[#999999]">{r.rooms || '-'}</td>
-                        <td className="py-2 px-3 text-[#999999]">{r.size_sqm ?? '-'}</td>
+                      <tr key={i} className="hover:bg-[#1b1b1b] transition-colors">
+                        <td className="py-2.5 px-3.5 font-medium text-white">{r.owner_name || '-'}</td>
+                        <td className="py-2.5 px-3.5 text-blue-400 font-medium">{r.phone}</td>
+                        <td className="py-2.5 px-3.5 text-[#cccccc]">{r.building_name}</td>
+                        <td className="py-2.5 px-3.5 text-[#cccccc]">{r.unit_number || '-'}</td>
+                        <td className="py-2.5 px-3.5 text-[#888888]">{r.rooms || '-'}</td>
+                        <td className="py-2.5 px-3.5 text-[#888888]">{r.size_sqm ?? '-'}</td>
                       </tr>
                     ))
                   )}
@@ -464,7 +468,7 @@ export default function AiImportModal({
           </div>
 
           {error && (
-            <div className="p-3 rounded-xl bg-[#2d1b1b] border border-[#542828] text-[#f87171] text-xs flex items-center gap-2">
+            <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-800/50 text-red-400 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -472,12 +476,12 @@ export default function AiImportModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-end gap-3 border-t border-[#2e2e2e] pt-4">
+        <div className="flex items-center justify-end gap-3 border-t border-[#2a2a2a] pt-5">
           <button
             type="button"
             onClick={onClose}
             disabled={importing}
-            className="px-4 py-2.5 rounded-xl bg-[#2a2a2a] hover:bg-[#333333] text-xs font-medium text-[#cccccc] transition cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-[#242424] hover:bg-[#2d2d2d] text-xs font-medium text-[#cccccc] hover:text-white transition cursor-pointer border border-[#333333]"
           >
             Cancel
           </button>
@@ -485,7 +489,7 @@ export default function AiImportModal({
             type="button"
             onClick={handleConfirmImport}
             disabled={importing || mappedRows.length === 0}
-            className="px-6 py-2.5 rounded-xl bg-[#89c900] hover:bg-[#7bb700] disabled:opacity-40 text-gray-950 font-bold text-xs flex items-center gap-2 transition shadow-lg cursor-pointer"
+            className="px-6 py-2.5 rounded-xl bg-[#89c900] hover:bg-[#7bb700] active:bg-[#6fa500] disabled:opacity-40 text-gray-950 font-bold text-xs flex items-center gap-2 transition shadow-md cursor-pointer"
           >
             {importing ? (
               <>
