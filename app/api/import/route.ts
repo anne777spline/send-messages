@@ -93,12 +93,12 @@ async function upsertBatch(supabase: any, rows: any[]) {
   if (!rows.length) return;
   const map = new Map();
   for (const r of rows) {
-    const key = `${r.phone}|${r.building_name}|${r.unit_number}`;
+    const key = `${r.tenant_id}|${r.phone}|${r.building_name}|${r.unit_number}`;
     if (!map.has(key)) map.set(key, r);
   }
   const { error } = await supabase
     .from('properties')
-    .upsert(Array.from(map.values()), { onConflict: 'phone,building_name,unit_number', ignoreDuplicates: false });
+    .upsert(Array.from(map.values()), { onConflict: 'tenant_id,phone,building_name,unit_number', ignoreDuplicates: false });
   if (error) {
     console.error('Upsert error:', error.message);
     throw new Error(error.message);
