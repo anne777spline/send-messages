@@ -15,69 +15,124 @@ export async function GET(request: Request) {
 
   const supabase = createServerSupabase();
   const { searchParams } = new URL(request.url);
+  const area = searchParams.get('area');
   const building = searchParams.get('building');
   const roomsParam = searchParams.get('rooms');
   const search = searchParams.get('search') || searchParams.get('phone') || searchParams.get('q');
   const action = searchParams.get('action');
 
   try {
+    // 1. Get Distinct Areas / Zones
+    if (action === 'areas') {
+      try {
+        const { data, error } = await supabase.rpc('get_tenant_areas', { p_tenant_id: tenant.tenantId });
+        if (!error && Array.isArray(data)) {
+          const areas = data.map((r: any) => r.area_en).filter(Boolean);
+          return NextResponse.json({ success: true, count: areas.length, areas });
+        }
+      } catch (e) {
+        console.warn('RPC get_tenant_areas fallback:', e);
+      }
+
+      // Safe Fallback
+      const { data: rawData } = await supabase
+        .from('properties')
+        .select('area_en')
+        .eq('tenant_id', tenant.tenantId)
+        .not('area_en', 'is', null)
+        .limit(2000);
+      const set = new Set<string>();
+      (rawData || []).forEach((r: any) => {
+        if (r.area_en && r.area_en.trim()) set.add(r.area_en.trim());
+      });
+      const areas = Array.from(set).sort((a, b) => a.localeCompare(b));
+      return NextResponse.json({ success: true, count: areas.length, areas });
+    }
+
+    // 2. Get Distinct Buildings (optionally filtered by area)
     if (action === 'buildings') {
-      const set = new Set<string>();
-      for (let p = 0; p < 65; p++) {
-        const { data, error } = await supabase
-          .from('properties')
-          .select('building_name')
-          .eq('tenant_id', tenant.tenantId)
-          .not('building_name', 'is', null)
-          .range(p * 1000, (p + 1) * 1000 - 1);
-        if (error || !data || data.length === 0) break;
-        data.forEach((r: any) => {
-          if (r.building_name && r.building_name.trim()) {
-            set.add(r.building_name.trim());
-          }
+      try {
+        const { data, error } = await supabase.rpc('get_tenant_buildings', {
+          p_tenant_id: tenant.tenantId,
+          p_area: area && area.trim() ? area.trim() : null
         });
+        if (!error && Array.isArray(data)) {
+          const buildings = data.map((r: any) => r.building_name).filter(Boolean);
+          return NextResponse.json({ success: true, count: buildings.length, buildings });
+        }
+      } catch (e) {
+        console.warn('RPC get_tenant_buildings fallback:', e);
       }
-      const uniqueSorted = Array.from(set).sort((a, b) => a.localeCompare(b));
-      return NextResponse.json({ success: true, count: uniqueSorted.length, buildings: uniqueSorted });
+
+      // Safe Fallback
+      let query = supabase
+        .from('properties')
+        .select('building_name')
+        .eq('tenant_id', tenant.tenantId)
+        .not('building_name', 'is', null);
+      if (area && area.trim()) {
+        query = query.ilike('area_en', `%${area.trim()}%`);
+      }
+      const { data: rawData } = await query.limit(5000);
+      const set = new Set<string>();
+      (rawData || []).forEach((r: any) => {
+        if (r.building_name && r.building_name.trim()) set.add(r.building_name.trim());
+      });
+      const buildings = Array.from(set).sort((a, b) => a.localeCompare(b));
+      return NextResponse.json({ success: true, count: buildings.length, buildings });
     }
 
+    // 3. Get Distinct Rooms
     if (action === 'rooms') {
-      const set = new Set<string>();
-      for (let p = 0; p < 65; p++) {
-        const { data, error } = await supabase
-          .from('properties')
-          .select('rooms')
-          .eq('tenant_id', tenant.tenantId)
-          .not('rooms', 'is', null)
-          .range(p * 1000, (p + 1) * 1000 - 1);
-        if (error || !data || data.length === 0) break;
-        data.forEach((r: any) => {
-          if (r.rooms) {
-            const raw = String(r.rooms).trim();
-            const lower = raw.toLowerCase();
-            if (
-              raw &&
-              lower !== 'null' &&
-              lower !== 'undefined' &&
-              lower !== 'none' &&
-              lower !== 'n/a' &&
-              lower !== '-' &&
-              lower !== 'nan'
-            ) {
-              set.add(raw);
-            }
-          }
-        });
+      try {
+        const { data, error } = await supabase.rpc('get_tenant_rooms', { p_tenant_id: tenant.tenantId });
+        if (!error && Array.isArray(data)) {
+          const rooms = data.map((r: any) => r.rooms).filter(Boolean);
+          return NextResponse.json({ success: true, count: rooms.length, rooms });
+        }
+      } catch (e) {
+        console.warn('RPC get_tenant_rooms fallback:', e);
       }
-      const uniqueSorted = Array.from(set).sort((a, b) => a.localeCompare(b));
-      return NextResponse.json({ success: true, count: uniqueSorted.length, rooms: uniqueSorted });
+
+      // Safe Fallback
+      const { data: rawData } = await supabase
+        .from('properties')
+        .select('rooms')
+        .eq('tenant_id', tenant.tenantId)
+        .not('rooms', 'is', null)
+        .limit(2000);
+      const set = new Set<string>();
+      (rawData || []).forEach((r: any) => {
+        if (r.rooms) {
+          const raw = String(r.rooms).trim();
+          const lower = raw.toLowerCase();
+          if (
+            raw &&
+            lower !== 'null' &&
+            lower !== 'undefined' &&
+            lower !== 'none' &&
+            lower !== 'n/a' &&
+            lower !== '-' &&
+            lower !== 'nan'
+          ) {
+            set.add(raw);
+          }
+        }
+      });
+      const rooms = Array.from(set).sort((a, b) => a.localeCompare(b));
+      return NextResponse.json({ success: true, count: rooms.length, rooms });
     }
 
+    // 4. Main Query for Properties
     let query = supabase
       .from('properties')
-      .select('id, phone, owner_name, building_name, unit_number, rooms, size_sqm, email')
+      .select('id, phone, owner_name, building_name, unit_number, rooms, size_sqm, email, area_en')
       .eq('tenant_id', tenant.tenantId)
       .order('id', { ascending: true });
+
+    if (area && area.trim()) {
+      query = query.ilike('area_en', `%${area.trim()}%`);
+    }
 
     if (building && building.trim()) {
       query = query.eq('building_name', building.trim());

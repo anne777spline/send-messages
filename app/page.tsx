@@ -139,6 +139,13 @@ export default function Home() {
   const [waError, setWaError] = useState<string | null>(null);
 
   // Properties & Messaging State
+  const [areas, setAreas] = useState<string[]>([]);
+  const [selectedArea, setSelectedArea] = useState<string>('');
+  const [isAreaOpen, setIsAreaOpen] = useState<boolean>(false);
+  const [areaSearch, setAreaSearch] = useState<string>('');
+  const [areasLoading, setAreasLoading] = useState<boolean>(false);
+  const areaDropdownRef = useRef<HTMLDivElement>(null);
+
   const [buildings, setBuildings] = useState<string[]>([]);
   const [selectedBuilding, setSelectedBuilding] = useState<string>('');
   const [isBuildingOpen, setIsBuildingOpen] = useState<boolean>(false);
@@ -154,6 +161,9 @@ export default function Home() {
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
+      if (areaDropdownRef.current && !areaDropdownRef.current.contains(event.target as Node)) {
+        setIsAreaOpen(false);
+      }
       if (buildingDropdownRef.current && !buildingDropdownRef.current.contains(event.target as Node)) {
         setIsBuildingOpen(false);
       }
@@ -317,11 +327,29 @@ export default function Home() {
     }
   };
 
-  // 6. Buildings Loader
-  const loadBuildings = useCallback(async () => {
+  // 6. Areas, Buildings & Rooms Loaders
+  const loadAreas = useCallback(async () => {
+    setAreasLoading(true);
+    try {
+      const res = await fetch('/api/properties?action=areas');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.areas)) {
+        setAreas(data.areas);
+      }
+    } catch (err) {
+      console.error('Error loading areas:', err);
+    } finally {
+      setAreasLoading(false);
+    }
+  }, []);
+
+  const loadBuildings = useCallback(async (areaFilter?: string) => {
     setBuildingsLoading(true);
     try {
-      const res = await fetch('/api/properties?action=buildings');
+      const url = areaFilter && areaFilter.trim()
+        ? `/api/properties?action=buildings&area=${encodeURIComponent(areaFilter.trim())}`
+        : '/api/properties?action=buildings';
+      const res = await fetch(url);
       const data = await res.json();
       if (data.success && Array.isArray(data.buildings)) {
         setBuildings(data.buildings);
@@ -363,10 +391,11 @@ export default function Home() {
 
   useEffect(() => {
     if (session) {
-      loadBuildings();
+      loadAreas();
+      loadBuildings(selectedArea);
       loadRooms();
     }
-  }, [session, loadBuildings, loadRooms]);
+  }, [session, selectedArea, loadAreas, loadBuildings, loadRooms]);
 
   // 7. Search Properties
   const handleSearch = async (e?: React.FormEvent) => {
@@ -376,6 +405,7 @@ export default function Home() {
     setHasSearched(true);
     try {
       const params = new URLSearchParams();
+      if (selectedArea.trim()) params.append('area', selectedArea.trim());
       if (selectedBuilding.trim()) params.append('building', selectedBuilding.trim());
       if (selectedRooms.length > 0) params.append('rooms', selectedRooms.join(','));
       if (searchTerm.trim()) params.append('search', searchTerm.trim());
@@ -400,6 +430,7 @@ export default function Home() {
   };
 
   const handleClearFilters = () => {
+    setSelectedArea('');
     setSelectedBuilding('');
     setSelectedRooms([]);
     setSearchTerm('');
@@ -518,6 +549,7 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          area: selectedArea,
           building: selectedBuilding,
           phoneSearch: searchTerm,
           template,
@@ -1039,6 +1071,7 @@ export default function Home() {
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { tag: 'owner_name', label: '+ Owner Name' },
+                  { tag: 'area', label: '+ Area/Zone' },
                   { tag: 'building_name', label: '+ Building' },
                   { tag: 'unit_number', label: '+ Unit' },
                   { tag: 'rooms', label: '+ Rooms' }
@@ -1150,12 +1183,107 @@ export default function Home() {
                 )}
               </div>
 
+              {/* Custom Styled Area / Zone Select Dropdown */}
+              <div ref={areaDropdownRef} className="relative w-full sm:w-56 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAreaOpen(!isAreaOpen);
+                    setIsBuildingOpen(false);
+                    setIsRoomsOpen(false);
+                  }}
+                  className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border transition focus:outline-none focus:border-blue-500 cursor-pointer ${isDark
+                    ? 'bg-[#181818] border-[#3a3a3a] text-white hover:border-[#555555]'
+                    : 'bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300'
+                    }`}
+                >
+                  <span className="truncate pr-2">
+                    {areasLoading
+                      ? 'Loading areas...'
+                      : selectedArea || `All Areas (${areas.length.toLocaleString()})`}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isAreaOpen ? 'rotate-180' : ''} ${isDark ? 'text-[#888888]' : 'text-gray-500'}`} />
+                </button>
+
+                {isAreaOpen && (
+                  <div
+                    className={`absolute top-full left-0 mt-1.5 w-full rounded-xl border shadow-2xl z-50 overflow-hidden ${isDark ? 'bg-[#1e1e1e] border-[#3a3a3a]' : 'bg-white border-gray-200'
+                      }`}
+                  >
+                    {areas.length > 5 && (
+                      <div className={`p-2 border-b ${isDark ? 'border-[#2d2d2d] bg-[#181818]' : 'border-gray-100 bg-gray-50'}`}>
+                        <input
+                          type="text"
+                          placeholder="Filter areas..."
+                          value={areaSearch}
+                          onChange={e => setAreaSearch(e.target.value)}
+                          className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${isDark
+                            ? 'bg-[#222222] border-[#333333] text-white placeholder-[#777777] focus:border-blue-500'
+                            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'
+                            }`}
+                        />
+                      </div>
+                    )}
+
+                    <div className="max-h-60 overflow-y-auto py-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedArea('');
+                          setSelectedBuilding('');
+                          setIsAreaOpen(false);
+                          setAreaSearch('');
+                        }}
+                        className={`w-full text-left px-3.5 py-2 text-sm flex items-center justify-between transition cursor-pointer ${!selectedArea
+                          ? isDark
+                            ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                            : 'bg-blue-50 text-blue-600 font-semibold'
+                          : isDark
+                            ? 'hover:bg-[#2a2a2a] text-white'
+                            : 'hover:bg-gray-50 text-gray-800'
+                          }`}
+                      >
+                        <span>All Areas ({areas.length.toLocaleString()})</span>
+                        {!selectedArea && <Check className="w-3.5 h-3.5 text-blue-500" />}
+                      </button>
+
+                      {areas
+                        .filter(a => a.toLowerCase().includes(areaSearch.toLowerCase()))
+                        .map(a => (
+                          <button
+                            key={a}
+                            type="button"
+                            onClick={() => {
+                              setSelectedArea(a);
+                              setSelectedBuilding('');
+                              setIsAreaOpen(false);
+                              setAreaSearch('');
+                            }}
+                            className={`w-full text-left px-3.5 py-2 text-sm flex items-center justify-between transition cursor-pointer ${selectedArea === a
+                              ? isDark
+                                ? 'bg-blue-600/20 text-blue-400 font-semibold'
+                                : 'bg-blue-50 text-blue-600 font-semibold'
+                              : isDark
+                                ? 'hover:bg-[#2a2a2a] text-[#cccccc] hover:text-white'
+                                : 'hover:bg-gray-50 text-gray-800'
+                              }`}
+                          >
+                            <span className="truncate pr-2">{a}</span>
+                            {selectedArea === a && <Check className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Custom Styled Building Select Dropdown */}
               <div ref={buildingDropdownRef} className="relative w-full sm:w-64 flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => {
                     setIsBuildingOpen(!isBuildingOpen);
+                    setIsAreaOpen(false);
                     setIsRoomsOpen(false);
                   }}
                   className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border transition focus:outline-none focus:border-blue-500 cursor-pointer ${isDark
@@ -1248,6 +1376,7 @@ export default function Home() {
                   type="button"
                   onClick={() => {
                     setIsRoomsOpen(!isRoomsOpen);
+                    setIsAreaOpen(false);
                     setIsBuildingOpen(false);
                   }}
                   className={`w-full rounded-xl px-3.5 py-2.5 text-sm flex justify-between items-center border transition focus:outline-none focus:border-blue-500 cursor-pointer ${isDark
@@ -1318,7 +1447,7 @@ export default function Home() {
               </button>
 
               {/* Clear button if search is active */}
-              {(searchTerm || selectedBuilding || selectedRooms.length > 0) && (
+              {(searchTerm || selectedArea || selectedBuilding || selectedRooms.length > 0) && (
                 <button
                   type="button"
                   onClick={handleClearFilters}
@@ -1429,6 +1558,7 @@ export default function Home() {
                         </th>
                         <th className="py-3 px-4">Owner Name</th>
                         <th className="py-3 px-4">Phone Number</th>
+                        <th className="py-3 px-4">Area / Zone</th>
                         <th className="py-3 px-4">Building</th>
                         <th className="py-3 px-4">Unit</th>
                         <th className="py-3 px-4">Rooms</th>
@@ -1446,6 +1576,7 @@ export default function Home() {
                           .replace(/{building_name}/gi, row.building_name || '')
                           .replace(/{unit_number}/gi, row.unit_number || '')
                           .replace(/{rooms}/gi, row.rooms || '')
+                          .replace(/{area}/gi, row.area_en || '')
                           .replace(/[ \t]+/g, ' ')
                           .trim();
 
@@ -1496,6 +1627,20 @@ export default function Home() {
                                   )}
                                 </button>
                               </div>
+                            </td>
+                            <td className={`py-3 px-4 whitespace-nowrap ${isDark ? 'text-[#cccccc]' : 'text-gray-700'}`}>
+                              {row.area_en ? (
+                                <span
+                                  className={`px-2 py-0.5 rounded text-xs border ${isDark
+                                    ? 'bg-[#89c900]/10 text-[#d8e454] border-[#89c900]/30'
+                                    : 'bg-[#89c900]/15 text-[#557e00] border-[#89c900]/30 font-medium'
+                                    }`}
+                                >
+                                  {row.area_en}
+                                </span>
+                              ) : (
+                                <span className="opacity-40">-</span>
+                              )}
                             </td>
                             <td className={`py-3 px-4 whitespace-nowrap ${isDark ? 'text-[#cccccc]' : 'text-gray-700'}`}>
                               {row.building_name || '-'}

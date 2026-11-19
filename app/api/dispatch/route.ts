@@ -31,17 +31,18 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { building, phoneSearch, template, selectedIds } = body;
+  const { area, building, phoneSearch, template, selectedIds } = body;
 
   // 3. Consultar properties filtradas por tenant
   let query = admin
     .from('properties')
-    .select('id, phone, owner_name, building_name, unit_number, rooms')
+    .select('id, phone, owner_name, building_name, unit_number, rooms, area_en')
     .eq('tenant_id', tenant.tenantId);
 
   if (Array.isArray(selectedIds) && selectedIds.length > 0) {
     query = query.in('id', selectedIds);
   } else {
+    if (area) query = query.ilike('area_en', `%${area}%`);
     if (building) query = query.eq('building_name', building);
     if (phoneSearch) {
       const clean = phoneSearch.trim();
@@ -87,6 +88,7 @@ export async function POST(request: Request) {
       .replace(/{building_name}/gi, row.building_name || '')
       .replace(/{unit_number}/gi, row.unit_number || '')
       .replace(/{rooms}/gi, row.rooms || '')
+      .replace(/{area}/gi, row.area_en || '')
       .replace(/[ \t]+/g, ' ')
       .trim();
     return {
